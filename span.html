@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>SPAN — One-Shot Engineering</title>
+<style>
+  :root {
+    --bg: #071019;
+    --panel: rgba(11, 23, 35, .86);
+    --line: rgba(255,255,255,.10);
+    --text: #eef6fb;
+    --muted: #92a9b8;
+    --cyan: #51d6ff;
+    --lime: #a8ff78;
+    --orange: #ffb65c;
+    --red: #ff5d73;
+    --steel: #a9c4d6;
+    --road: #ffd36a;
+    --cable: #60e0b3;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  #app { position:relative; width:100%; height:100%; background:radial-gradient(circle at 50% 15%, #112b3a 0, #071019 48%, #04080d 100%); }
+  canvas { position:absolute; inset:0; width:100%; height:100%; touch-action:none; }
+  .topbar {
+    position:absolute; left:0; top:0; right:0; min-height:76px; display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; gap:14px; background:linear-gradient(180deg, rgba(3,8,13,.95), rgba(3,8,13,.55), transparent); pointer-events:none;
+  }
+  .brand { display:flex; align-items:center; gap:12px; min-width:0; }
+  .logo { width:42px; height:42px; border-radius:13px; display:grid; place-items:center; font-weight:900; letter-spacing:-2px; color:#071019; background:linear-gradient(135deg,var(--cyan),var(--lime)); box-shadow:0 8px 28px rgba(81,214,255,.22); }
+  .title { line-height:1; min-width:0; }
+  .title strong { display:block; font-size:17px; letter-spacing:.18em; }
+  .title span { display:block; margin-top:5px; color:var(--muted); font-size:11px; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .stats { display:flex; gap:8px; pointer-events:auto; }
+  .stat { min-width:96px; padding:9px 12px; border:1px solid var(--line); background:rgba(8,19,28,.72); border-radius:13px; backdrop-filter:blur(12px); }
+  .stat b { display:block; font-size:14px; }
+  .stat small { display:block; margin-top:2px; color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.1em; }
+  .stat.danger b { color:var(--red); }
+
+  .toolbar {
+    position:absolute; left:50%; bottom:18px; transform:translateX(-50%); display:flex; align-items:center; gap:8px; padding:8px;
+    border:1px solid var(--line); background:var(--panel); border-radius:18px; backdrop-filter:blur(18px); box-shadow:0 18px 60px rgba(0,0,0,.35);
+  }
+  button { font:inherit; }
+  .tool, .action {
+    border:1px solid transparent; background:rgba(255,255,255,.045); color:var(--text); border-radius:12px; min-height:46px; padding:8px 12px;
+    cursor:pointer; transition:.15s ease; user-select:none; -webkit-tap-highlight-color:transparent;
+  }
+  .tool:hover, .action:hover { background:rgba(255,255,255,.09); transform:translateY(-1px); }
+  .tool.active { border-color:rgba(81,214,255,.65); background:rgba(81,214,255,.14); box-shadow:0 0 0 3px rgba(81,214,255,.07) inset; }
+  .tool b, .action b { display:block; font-size:12px; }
+  .tool small, .action small { display:block; margin-top:2px; font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; }
+  .dot { display:inline-block; width:8px; height:8px; margin-right:6px; border-radius:50%; vertical-align:1px; }
+  .separator { width:1px; height:36px; background:var(--line); margin:0 2px; }
+  .action.primary { background:linear-gradient(135deg,#4bd7ff,#73f0b5); color:#061019; font-weight:800; padding-inline:16px; }
+  .action.warn { color:#ffd8de; }
+  .action:disabled, .tool:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+
+  .side {
+    position:absolute; right:18px; top:88px; width:260px; padding:15px; border:1px solid var(--line); border-radius:16px; background:rgba(8,18,28,.74); backdrop-filter:blur(16px);
+  }
+  .side h3 { margin:0 0 8px; font-size:12px; letter-spacing:.13em; text-transform:uppercase; }
+  .side p { margin:0; color:var(--muted); font-size:12px; line-height:1.5; }
+  .legend { margin-top:12px; display:grid; gap:7px; }
+  .legend-row { display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:11px; }
+  .legend-row span:first-child { color:var(--text); }
+  .stressbar { height:6px; border-radius:99px; background:linear-gradient(90deg,var(--lime),var(--orange),var(--red)); margin-top:4px; }
+
+  .toast {
+    position:absolute; left:50%; top:94px; transform:translate(-50%,-12px); opacity:0; pointer-events:none; max-width:min(520px,calc(100vw - 32px));
+    padding:12px 16px; border:1px solid var(--line); border-radius:13px; background:rgba(6,15,23,.90); backdrop-filter:blur(14px); color:var(--text); font-size:13px; text-align:center;
+    transition:.25s ease;
+  }
+  .toast.show { opacity:1; transform:translate(-50%,0); }
+  .toast.success { border-color:rgba(168,255,120,.45); }
+  .toast.fail { border-color:rgba(255,93,115,.50); }
+
+  .modal {
+    position:absolute; inset:0; display:none; place-items:center; padding:24px; background:rgba(2,7,11,.68); backdrop-filter:blur(9px); z-index:5;
+  }
+  .modal.show { display:grid; }
+  .card { width:min(520px,100%); border:1px solid var(--line); border-radius:24px; background:linear-gradient(180deg,rgba(13,29,42,.97),rgba(6,14,22,.98)); padding:26px; box-shadow:0 30px 100px rgba(0,0,0,.52); }
+  .eyebrow { color:var(--cyan); font-size:10px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; }
+  .card h1 { margin:8px 0 10px; font-size:34px; line-height:1; letter-spacing:-.04em; }
+  .card p { color:var(--muted); line-height:1.55; font-size:14px; }
+  .mission { margin:18px 0; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .mission div { padding:12px; border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.035); }
+  .mission b { display:block; font-size:17px; }
+  .mission small { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:9px; }
+  .bigbtn { width:100%; border:0; border-radius:14px; padding:14px; background:linear-gradient(135deg,var(--cyan),var(--lime)); color:#061019; font-weight:900; font-size:14px; cursor:pointer; }
+  .level-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:16px 0 18px; }
+  .level-btn { padding:13px 8px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--text); border-radius:12px; cursor:pointer; }
+  .level-btn.active { border-color:var(--cyan); background:rgba(81,214,255,.12); }
+  .level-btn b { display:block; }
+  .level-btn small { color:var(--muted); }
+
+  @media (max-width: 840px) {
+    .side { display:none; }
+    .stats .stat:nth-child(3) { display:none; }
+    .toolbar { left:8px; right:8px; transform:none; overflow-x:auto; justify-content:flex-start; bottom:8px; }
+    .tool, .action { flex:0 0 auto; min-height:44px; padding-inline:10px; }
+    .topbar { padding:10px 12px; }
+    .title span { max-width:140px; }
+    .stat { min-width:82px; padding:8px 9px; }
+    .logo { width:38px; height:38px; }
+  }
+  @media (max-width: 560px) {
+    .stats .stat:nth-child(2) { display:none; }
+    .title strong { font-size:14px; }
+    .toolbar small { display:none; }
+    .tool, .action { min-height:40px; }
+    .card { padding:21px; }
+    .card h1 { font-size:29px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">S//</div>
+      <div class="title"><strong>SPAN</strong><span>One-shot structural engineering</span></div>
+    </div>
+    <div class="stats">
+      <div class="stat" id="budgetStat"><b id="budgetText">$0</b><small>Budget left</small></div>
+      <div class="stat"><b id="massText">0 kg</b><small>Structure mass</small></div>
+      <div class="stat"><b id="statusText">BUILD</b><small>System status</small></div>
+    </div>
+  </div>
+
+  <div class="side">
+    <h3 id="challengeTitle">Challenge 01</h3>
+    <p id="challengeCopy">Bridge the ravine. Build a continuous road deck and brace it with triangles before sending the test vehicle.</p>
+    <div class="legend">
+      <div class="legend-row"><span>Road deck</span><b>$130 / m</b></div>
+      <div class="legend-row"><span>Steel beam</span><b>$85 / m</b></div>
+      <div class="legend-row"><span>Tension cable</span><b>$45 / m</b></div>
+      <div class="legend-row"><span>Stress</span><b>low → failure</b></div>
+      <div class="stressbar"></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="tool active" data-tool="road"><b><i class="dot" style="background:var(--road)"></i>Road</b><small>Rigid deck</small></button>
+    <button class="tool" data-tool="steel"><b><i class="dot" style="background:var(--steel)"></i>Steel</b><small>Compression</small></button>
+    <button class="tool" data-tool="cable"><b><i class="dot" style="background:var(--cable)"></i>Cable</b><small>Tension only</small></button>
+    <button class="tool" data-tool="delete"><b>✕ Delete</b><small>Tap a member</small></button>
+    <span class="separator"></span>
+    <button class="action" id="undoBtn"><b>↶ Undo</b><small>Last change</small></button>
+    <button class="action warn" id="resetBtn"><b>Reset</b><small>Clear design</small></button>
+    <button class="action primary" id="testBtn"><b>▶ TEST</b><small>One shot</small></button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal show" id="introModal">
+    <div class="card">
+      <div class="eyebrow">Structural simulation // v1.0</div>
+      <h1>Design it.<br>Test it once.</h1>
+      <p>Tap empty space to add a joint. Tap one joint and then another to connect them. Build a road from the left anchor to the right, brace it, and launch the vehicle.</p>
+      <div class="level-grid" id="levelGrid"></div>
+      <div class="mission">
+        <div><b id="mGap">42 m</b><small>Span</small></div>
+        <div><b id="mBudget">$12k</b><small>Budget</small></div>
+        <div><b id="mLoad">8 t</b><small>Load</small></div>
+      </div>
+      <button class="bigbtn" id="startBtn">ENTER BUILD MODE</button>
+    </div>
+  </div>
+
+  <div class="modal" id="resultModal">
+    <div class="card">
+      <div class="eyebrow" id="resultEyebrow">Simulation complete</div>
+      <h1 id="resultTitle">Bridge certified.</h1>
+      <p id="resultCopy">The vehicle crossed safely.</p>
+      <div class="mission">
+        <div><b id="rCost">$0</b><small>Cost</small></div>
+        <div><b id="rStress">0%</b><small>Peak stress</small></div>
+        <div><b id="rScore">0</b><small>Score</small></div>
+      </div>
+      <button class="bigbtn" id="againBtn">BUILD AGAIN</button>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  'use strict';
+
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const app = document.getElementById('app');
+  const budgetText = document.getElementById('budgetText');
+  const massText = document.getElementById('massText');
+  const statusText = document.getElementById('statusText');
+  const budgetStat = document.getElementById('budgetStat');
+  const toast = document.getElementById('toast');
+  const introModal = document.getElementById('introModal');
+  const resultModal = document.getElementById('resultModal');
+  const testBtn = document.getElementById('testBtn');
+  const undoBtn = document.getElementById('undoBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const challengeTitle = document.getElementById('challengeTitle');
+  const challengeCopy = document.getElementById('challengeCopy');
+
+  const LEVELS = [
+    { name:'The Cut', gap:420, budget:12800, load:7200, gravity:1080, wind:0, copy:'Bridge the ravine. Build a continuous road deck and brace it with triangles before sending the test vehicle.' },
+    { name:'Crosswind', gap:500, budget:14500, load:8800, gravity:1120, wind:30, copy:'A longer span with gusting crosswind. Deep trusses and tension members will help control movement.' },
+    { name:'Heavy Haul', gap:550, budget:16600, load:12000, gravity:1160, wind:16, copy:'Carry a heavy transporter across a wide gorge. Cheap, shallow structures are likely to buckle.' }
+  ];
+
+  const MAT = {
+    road:  { label:'Road',  color:'#ffd36a', cost:130, mass:20, stiff:0.94, strength:0.115, max:135, width:8 },
+    steel: { label:'Steel', color:'#a9c4d6', cost:85,  mass:11, stiff:0.88, strength:0.145, max:170, width:5 },
+    cable: { label:'Cable', color:'#60e0b3', cost:45,  mass:4,  stiff:0.72, strength:0.18,  max:235, width:3, tensionOnly:true }
+  };
+
+  let W=0,H=0,DPR=1;
+  let levelIndex=0, level=LEVELS[0];
+  let mode='build';
+  let tool='road';
+  let nodes=[];
+  let members=[];
+  let history=[];
+  let selectedNode=null;
+  let hover={x:0,y:0,node:null,member:null};
+  let anchors={};
+  let budgetUsed=0;
+  let simTime=0;
+  let peakStress=0;
+  let shake=0;
+  let car=null;
+  let roadPath=[];
+  let lastFrame=performance.now();
+  let accumulator=0;
+  let toastTimer=null;
+  let levelReady=false;
+  let resultShown=false;
+  let particles=[];
+
+  function resize(){
+    DPR=Math.min(2,window.devicePixelRatio||1);
+    W=app.clientWidth; H=app.clientHeight;
+    canvas.width=Math.floor(W*DPR); canvas.height=Math.floor(H*DPR);
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    if(levelReady && mode==='build') setupLevel(false);
+  }
+  window.addEventListener('resize',resize);
+
+  function levelGeometry(){
+    const roadY=Math.max(210, Math.min(H*.48, H-245));
+    const gapPx=Math.min(level.gap, W-210);
+    const leftX=(W-gapPx)/2;
+    const rightX=(W+gapPx)/2;
+    return {roadY,leftX,rightX,gapPx,groundY:roadY+76};
+  }
+
+  function setupLevel(clearHistory=true){
+    level=LEVELS[levelIndex];
+    const g=levelGeometry();
+    nodes=[]; members=[]; particles=[]; budgetUsed=0; selectedNode=null; roadPath=[]; car=null;
+    simTime=0; peakStress=0; resultShown=false; shake=0; mode='build';
+    anchors={
+      left:newNode(g.leftX,g.roadY,true,'road'),
+      right:newNode(g.rightX,g.roadY,true,'road'),
+      leftLow:newNode(g.leftX-18,g.roadY+74,true,'rock'),
+      rightLow:newNode(g.rightX+18,g.roadY+74,true,'rock')
+    };
+    if(clearHistory) history=[];
+    levelReady=true;
+    updateUI();
+  }
+
+  function newNode(x,y,fixed=false,kind='joint'){
+    const n={ id:cryptoId(), x,y,px:x,py:y,vx:0,vy:0,fx:0,fy:0,fixed,kind,mass:fixed?999999:12,dead:false };
+    nodes.push(n); return n;
+  }
+  function cryptoId(){ return Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4); }
+
+  function addMember(a,b,type,record=true){
+    if(!a||!b||a===b) return false;
+    if(members.some(m=>!m.broken && ((m.a===a&&m.b===b)||(m.a===b&&m.b===a)))) { flash('Those joints are already connected.','fail'); return false; }
+    const mat=MAT[type];
+    const len=dist(a,b);
+    if(len>mat.max){ flash(`${mat.label} members are limited to ${Math.round(mat.max/10)} m.`, 'fail'); return false; }
+    if(len<24){ flash('Member is too short.','fail'); return false; }
+    const cost=len/10*mat.cost;
+    if(budgetUsed+cost>level.budget){ flash('Budget exceeded. Remove a member or choose a cheaper material.','fail'); return false; }
+    const m={id:cryptoId(),a,b,type,rest:len,cost,broken:false,stress:0,age:0};
+    members.push(m); budgetUsed+=cost;
+    a.mass+=mat.mass*len/100; b.mass+=mat.mass*len/100;
+    if(record) pushHistory({kind:'addMember',id:m.id,createdNodeIds:[]});
+    updateUI(); return m;
+  }
+
+  function removeMember(m,record=true){
+    if(!m) return;
+    budgetUsed-=m.cost;
+    members=members.filter(x=>x!==m);
+    if(record) pushHistory({kind:'removeMember',snapshot:serializeMember(m)});
+    cleanupLooseNodes(); updateUI();
+  }
+
+  function cleanupLooseNodes(){
+    nodes=nodes.filter(n=>n.fixed || members.some(m=>m.a===n||m.b===n));
+    if(selectedNode && !nodes.includes(selectedNode)) selectedNode=null;
+  }
+
+  function serializeMember(m){ return {id:m.id,a:m.a.id,b:m.b.id,type:m.type,rest:m.rest,cost:m.cost}; }
+  function pushHistory(action){ history.push(action); if(history.length>80)history.shift(); undoBtn.disabled=false; }
+  function undo(){
+    if(mode!=='build'||!history.length)return;
+    const h=history.pop();
+    if(h.kind==='addMember'){
+      const m=members.find(x=>x.id===h.id); if(m) removeMember(m,false);
+      (h.createdNodeIds||[]).forEach(id=>{ const n=nodes.find(x=>x.id===id); if(n&&!n.fixed&&!members.some(m=>m.a===n||m.b===n))nodes=nodes.filter(x=>x!==n); });
+    } else if(h.kind==='removeMember') {
+      const a=nodes.find(n=>n.id===h.snapshot.a), b=nodes.find(n=>n.id===h.snapshot.b);
+      if(a&&b){ const m=addMember(a,b,h.snapshot.type,false); if(m)m.id=h.snapshot.id; }
+    } else if(h.kind==='addNode'){
+      const n=nodes.find(x=>x.id===h.id); if(n&&!members.some(m=>m.a===n||m.b===n))nodes=nodes.filter(x=>x!==n);
+    }
+    undoBtn.disabled=!history.length; updateUI();
+  }
+
+  function updateUI(){
+    const left=Math.max(0,level.budget-budgetUsed);
+    budgetText.textContent='$'+Math.round(left).toLocaleString();
+    budgetStat.classList.toggle('danger',left<level.budget*.12);
+    const mass=members.reduce((s,m)=>s+MAT[m.type].mass*m.rest/10,0);
+    massText.textContent=Math.round(mass).toLocaleString()+' kg';
+    statusText.textContent=mode==='build'?'BUILD':mode==='simulate'?'LIVE':mode==='success'?'PASS':'FAIL';
+    challengeTitle.textContent=`Challenge 0${levelIndex+1} // ${level.name}`;
+    challengeCopy.textContent=level.copy;
+    testBtn.disabled=mode!=='build';
+    undoBtn.disabled=mode!=='build'||!history.length;
+    document.querySelectorAll('.tool').forEach(b=>b.disabled=mode!=='build');
+    resetBtn.disabled=mode==='simulate';
+  }
+
+  function setTool(t){
+    tool=t; selectedNode=null;
+    document.querySelectorAll('.tool').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));
+  }
+  document.querySelectorAll('.tool').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
+  undoBtn.addEventListener('click',undo);
+  resetBtn.addEventListener('click',()=>{ setupLevel(); flash('Design cleared.',''); });
+  testBtn.addEventListener('click',startTest);
+
+  function pointerPos(e){
+    const r=canvas.getBoundingClientRect(); return {x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height};
+  }
+  canvas.addEventListener('pointermove',e=>{
+    const p=pointerPos(e); hover.x=p.x; hover.y=p.y;
+    if(mode==='build'){
+      hover.node=findNode(p.x,p.y,16);
+      hover.member=hover.node?null:findMember(p.x,p.y,12);
+    }
+  });
+  canvas.addEventListener('pointerdown',e=>{
+    if(mode!=='build'||introModal.classList.contains('show')||resultModal.classList.contains('show'))return;
+    const p=pointerPos(e);
+    if(tool==='delete'){
+      const m=findMember(p.x,p.y,14); if(m) removeMember(m,true); else flash('Tap directly on a member to remove it.','');
+      return;
+    }
+    const g=levelGeometry();
+    if(p.y<120||p.y>g.groundY+115||p.x<24||p.x>W-24)return;
+    let n=findNode(p.x,p.y,18);
+    let created=false;
+    if(!n){
+      if(p.x<g.leftX-30||p.x>g.rightX+30){ flash('Place new joints inside the highlighted build zone.','fail'); return; }
+      n=newNode(snap(p.x),snap(p.y)); created=true;
+    }
+    if(!selectedNode){
+      selectedNode=n;
+      if(created) pushHistory({kind:'addNode',id:n.id});
+    } else if(selectedNode===n){
+      selectedNode=null;
+      if(created && !members.some(m=>m.a===n||m.b===n)) nodes=nodes.filter(x=>x!==n);
+    } else {
+      const first=selectedNode;
+      const m=addMember(first,n,tool,false);
+      if(m){
+        const createdIds=[];
+        if(created)createdIds.push(n.id);
+        pushHistory({kind:'addMember',id:m.id,createdNodeIds:createdIds});
+        selectedNode=n;
+      } else if(created) {
+        nodes=nodes.filter(x=>x!==n);
+      }
+    }
+  });
+
+  function snap(v){ return Math.round(v/10)*10; }
+  function findNode(x,y,r){ let best=null,bd=r; for(const n of nodes){const d=Math.hypot(n.x-x,n.y-y);if(d<bd){bd=d;best=n;}} return best; }
+  function findMember(x,y,r){ let best=null,bd=r; for(const m of members){if(m.broken)continue;const d=pointSegDist(x,y,m.a.x,m.a.y,m.b.x,m.b.y);if(d<bd){bd=d;best=m;}} return best; }
+  function pointSegDist(px,py,x1,y1,x2,y2){ const dx=x2-x1,dy=y2-y1,l2=dx*dx+dy*dy;if(!l2)return Math.hypot(px-x1,py-y1);let t=((px-x1)*dx+(py-y1)*dy)/l2;t=Math.max(0,Math.min(1,t));return Math.hypot(px-(x1+t*dx),py-(y1+t*dy)); }
+  function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y);}
+
+  function buildRoadPath(){
+    const roads=members.filter(m=>m.type==='road'&&!m.broken);
+    const graph=new Map();
+    function add(a,m){if(!graph.has(a.id))graph.set(a.id,[]);graph.get(a.id).push(m);}
+    roads.forEach(m=>{add(m.a,m);add(m.b,m);});
+    const q=[anchors.left], prev=new Map(), seen=new Set([anchors.left.id]);
+    while(q.length){
+      const n=q.shift(); if(n===anchors.right)break;
+      for(const m of graph.get(n.id)||[]){const o=m.a===n?m.b:m.a;if(!seen.has(o.id)){seen.add(o.id);prev.set(o.id,{n,m});q.push(o);}}
+    }
+    if(!seen.has(anchors.right.id))return [];
+    const path=[]; let cur=anchors.right;
+    while(cur!==anchors.left){const p=prev.get(cur.id);path.push(p.m);cur=p.n;}
+    path.reverse();
+    let node=anchors.left; return path.map(m=>{const next=m.a===node?m.b:m.a;const seg={m,a:node,b:next};node=next;return seg;});
+  }
+
+  function structuralConnectivity(){
+    // Every internal road node should have at least one non-road brace or three total connections.
+    const path=buildRoadPath(); if(!path.length)return false;
+    const roadNodes=[path[0].a,...path.map(s=>s.b)];
+    return roadNodes.slice(1,-1).every(n=>{
+      const attached=members.filter(m=>m.a===n||m.b===n);
+      return attached.length>=2;
+    });
+  }
+
+  function startTest(){
+    roadPath=buildRoadPath();
+    if(!roadPath.length){ flash('No continuous road: connect the two yellow deck anchors.','fail'); return; }
+    if(roadPath.length<4){ flash('Use shorter road sections so the deck can distribute the load.','fail'); return; }
+    if(!structuralConnectivity()){ flash('Some road joints are unsupported. Add steel or cable bracing.','fail'); return; }
+    mode='simulate'; selectedNode=null; history=[]; simTime=0; peakStress=0; resultShown=false;
+    for(const n of nodes){n.px=n.x;n.py=n.y;n.vx=0;n.vy=0;}
+    car={x:anchors.left.x-72,y:anchors.left.y-18,v:0,angle:0,progress:-72,falling:false,vy:0,done:false};
+    updateUI(); flash('Test initiated. Stress map is live.','');
+  }
+
+  function physicsStep(dt){
+    simTime+=dt;
+    const g=levelGeometry();
+    for(const n of nodes){
+      if(n.fixed)continue;
+      n.vy+=level.gravity*dt;
+      n.vx+=Math.sin(simTime*1.7+n.y*.01)*level.wind*dt;
+      n.vx*=0.996; n.vy*=0.996;
+      n.px=n.x; n.py=n.y;
+      n.x+=n.vx*dt; n.y+=n.vy*dt;
+    }
+
+    applyCarLoad(dt);
+
+    for(let iter=0;iter<10;iter++){
+      for(const m of members){
+        if(m.broken)continue;
+        const mat=MAT[m.type];
+        const dx=m.b.x-m.a.x,dy=m.b.y-m.a.y;
+        const len=Math.max(.001,Math.hypot(dx,dy));
+        const delta=(len-m.rest)/m.rest;
+        m.stress=Math.abs(delta)/mat.strength;
+        peakStress=Math.max(peakStress,m.stress);
+        if(mat.tensionOnly && len<m.rest)continue;
+        const diff=(len-m.rest)/len;
+        const corr=diff*mat.stiff;
+        const wa=m.a.fixed?0:1/Math.max(1,m.a.mass);
+        const wb=m.b.fixed?0:1/Math.max(1,m.b.mass);
+        const sum=wa+wb||1;
+        if(!m.a.fixed){m.a.x+=dx*corr*(wa/sum);m.a.y+=dy*corr*(wa/sum);}
+        if(!m.b.fixed){m.b.x-=dx*corr*(wb/sum);m.b.y-=dy*corr*(wb/sum);}
+        m.age+=dt/10;
+        if(m.age>.28 && Math.abs(delta)>mat.strength){ breakMember(m); }
+      }
+    }
+
+    for(const n of nodes){
+      if(n.fixed)continue;
+      n.vx=(n.x-n.px)/dt; n.vy=(n.y-n.py)/dt;
+      if(n.y>g.groundY+220){ n.y=g.groundY+220; n.vy=0; }
+    }
+    updateCar(dt);
+  }
+
+  function applyCarLoad(dt){
+    if(!car||car.falling||car.done)return;
+    const pos=roadPositionAt(car.progress);
+    if(!pos){car.falling=true;return;}
+    const load=level.load*level.gravity/1000;
+    const seg=pos.seg;
+    if(seg.m.broken){car.falling=true;return;}
+    if(!seg.a.fixed)seg.a.vy+=load*(1-pos.t)/Math.max(20,seg.a.mass)*dt;
+    if(!seg.b.fixed)seg.b.vy+=load*pos.t/Math.max(20,seg.b.mass)*dt;
+  }
+
+  function roadPositionAt(d){
+    if(d<0)return {x:anchors.left.x+d,y:anchors.left.y,angle:0,seg:roadPath[0],t:0};
+    let remaining=d;
+    for(const seg of roadPath){
+      if(seg.m.broken)return null;
+      const len=dist(seg.a,seg.b);
+      if(remaining<=len){const t=Math.max(0,Math.min(1,remaining/len));return {x:seg.a.x+(seg.b.x-seg.a.x)*t,y:seg.a.y+(seg.b.y-seg.a.y)*t,angle:Math.atan2(seg.b.y-seg.a.y,seg.b.x-seg.a.x),seg,t};}
+      remaining-=len;
+    }
+    return {x:anchors.right.x+remaining,y:anchors.right.y,angle:0,seg:roadPath[roadPath.length-1],t:1,after:true};
+  }
+  function roadTotalLength(){return roadPath.reduce((s,seg)=>s+dist(seg.a,seg.b),0);}
+
+  function updateCar(dt){
+    if(!car||car.done)return;
+    if(car.falling){
+      car.vy+=level.gravity*dt;car.y+=car.vy*dt;car.angle+=1.6*dt;
+      if(car.y>H+100)finish(false,'Vehicle lost. The deck path failed under load.');
+      return;
+    }
+    const target=78;
+    car.v+=(target-car.v)*Math.min(1,dt*2.2);
+    car.progress+=car.v*dt;
+    const pos=roadPositionAt(car.progress);
+    if(!pos){car.falling=true;car.vy=0;return;}
+    car.x=pos.x; car.y=pos.y-16; car.angle=pos.angle;
+    const total=roadTotalLength();
+    if(car.progress>total+70){car.done=true;finish(true,'The load reached the far side with the structure intact.');}
+    if(car.y>H+80){finish(false,'Vehicle lost in the ravine.');}
+    if(members.filter(m=>m.broken).length>Math.max(3,members.length*.24)){
+      // Let the collapse play out briefly rather than ending immediately.
+      if(simTime>4 && car.progress<total*.9) car.falling=true;
+    }
+  }
+
+  function breakMember(m){
+    if(m.broken)return; m.broken=true; shake=Math.max(shake,7);
+    for(let i=0;i<8;i++)particles.push({x:(m.a.x+m.b.x)/2,y:(m.a.y+m.b.y)/2,vx:(Math.random()-.5)*130,vy:(Math.random()-.7)*150,life:.6+Math.random()*.5});
+  }
+
+  function finish(success,copy){
+    if(resultShown)return; resultShown=true; mode=success?'success':'fail'; updateUI();
+    setTimeout(()=>{
+      document.getElementById('resultEyebrow').textContent=success?'Certification passed':'Structural failure';
+      document.getElementById('resultTitle').textContent=success?'Bridge certified.':'Back to the drawing board.';
+      document.getElementById('resultCopy').textContent=copy;
+      document.getElementById('rCost').textContent='$'+Math.round(budgetUsed).toLocaleString();
+      document.getElementById('rStress').textContent=Math.round(Math.min(199,peakStress*100))+'%';
+      const efficiency=Math.max(0,1-budgetUsed/level.budget);
+      const integrity=Math.max(0,1-Math.min(1,peakStress));
+      const score=success?Math.round(5000+efficiency*3200+integrity*1800):Math.round(Math.max(250,car?car.progress/Math.max(1,roadTotalLength())*3000:250));
+      document.getElementById('rScore').textContent=score.toLocaleString();
+      resultModal.classList.add('show');
+    },700);
+  }
+
+  function flash(msg,type=''){
+    toast.textContent=msg; toast.className='toast show'+(type?' '+type:'');
+    clearTimeout(toastTimer); toastTimer=setTimeout(()=>toast.classList.remove('show'),2600);
+  }
+
+  function stressColor(s,base){
+    if(mode==='build')return base;
+    s=Math.min(1.25,s||0);
+    if(s<.42)return mix('#a8ff78','#ffb65c',s/.42);
+    return mix('#ffb65c','#ff4f69',(s-.42)/.83);
+  }
+  function mix(a,b,t){
+    t=Math.max(0,Math.min(1,t));
+    const A=hex(a),B=hex(b);return `rgb(${Math.round(A[0]+(B[0]-A[0])*t)},${Math.round(A[1]+(B[1]-A[1])*t)},${Math.round(A[2]+(B[2]-A[2])*t)})`;
+  }
+  function hex(s){const v=parseInt(s.slice(1),16);return[(v>>16)&255,(v>>8)&255,v&255];}
+
+  function draw(){
+    ctx.save();
+    const sx=shake?(Math.random()-.5)*shake:0,sy=shake?(Math.random()-.5)*shake:0;ctx.translate(sx,sy);shake*=.90;
+    drawBackground();
+    drawBuildZone();
+    drawTerrain();
+    drawMembers();
+    drawNodes();
+    drawGhost();
+    drawCar();
+    drawParticles();
+    ctx.restore();
+  }
+
+  function drawBackground(){
+    const grd=ctx.createLinearGradient(0,0,0,H);grd.addColorStop(0,'#0b1c28');grd.addColorStop(.55,'#07121b');grd.addColorStop(1,'#04080d');ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
+    ctx.globalAlpha=.13;ctx.strokeStyle='#7bd8ff';ctx.lineWidth=1;
+    const step=40,off=(performance.now()*.004)%step;
+    for(let x=off;x<W;x+=step){ctx.beginPath();ctx.moveTo(x,90);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=90+off;y<H;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    ctx.globalAlpha=1;
+    const glow=ctx.createRadialGradient(W*.5,H*.35,20,W*.5,H*.35,W*.55);glow.addColorStop(0,'rgba(40,140,180,.10)');glow.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+  }
+
+  function drawBuildZone(){
+    if(mode!=='build')return;
+    const g=levelGeometry();
+    ctx.save();ctx.setLineDash([7,8]);ctx.lineWidth=1;ctx.strokeStyle='rgba(81,214,255,.22)';ctx.fillStyle='rgba(81,214,255,.025)';
+    ctx.beginPath();ctx.roundRect(g.leftX,g.roadY-145,g.gapPx,g.groundY-g.roadY+245,18);ctx.fill();ctx.stroke();ctx.restore();
+  }
+
+  function drawTerrain(){
+    const g=levelGeometry();
+    const leftEdge=g.leftX,rightEdge=g.rightX;
+    ctx.fillStyle='#152430';
+    ctx.beginPath();ctx.moveTo(0,g.roadY+8);ctx.lineTo(leftEdge,g.roadY+8);ctx.lineTo(leftEdge-25,g.groundY);ctx.lineTo(leftEdge-100,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(rightEdge,g.roadY+8);ctx.lineTo(W,g.roadY+8);ctx.lineTo(W,H);ctx.lineTo(rightEdge+100,H);ctx.lineTo(rightEdge+25,g.groundY);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#2d4a5b';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(0,g.roadY+8);ctx.lineTo(leftEdge,g.roadY+8);ctx.lineTo(leftEdge-25,g.groundY);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(rightEdge,g.roadY+8);ctx.lineTo(W,g.roadY+8);ctx.moveTo(rightEdge,g.roadY+8);ctx.lineTo(rightEdge+25,g.groundY);ctx.stroke();
+    ctx.fillStyle='rgba(81,214,255,.07)';ctx.fillRect(leftEdge,g.groundY+50,rightEdge-leftEdge,H-g.groundY-50);
+    ctx.fillStyle='#6a8797';ctx.font='10px ui-monospace, SFMono-Regular, Menlo, monospace';ctx.fillText('A0',leftEdge-13,g.roadY-16);ctx.fillText('A1',rightEdge-13,g.roadY-16);
+  }
+
+  function drawMembers(){
+    for(const m of members){
+      if(m.broken)continue;
+      const mat=MAT[m.type];
+      ctx.save();ctx.lineCap='round';ctx.strokeStyle=stressColor(m.stress,mat.color);ctx.lineWidth=mat.width;
+      if(m.type==='cable')ctx.setLineDash([7,5]);
+      ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=mode==='simulate'?6:2;
+      ctx.beginPath();ctx.moveTo(m.a.x,m.a.y);ctx.lineTo(m.b.x,m.b.y);ctx.stroke();
+      if(mode==='simulate' && m.stress>.68){
+        ctx.shadowBlur=0;ctx.setLineDash([]);ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=1;
+        const mx=(m.a.x+m.b.x)/2,my=(m.a.y+m.b.y)/2;ctx.beginPath();ctx.arc(mx,my,3+Math.sin(simTime*18)*1.5,0,Math.PI*2);ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawNodes(){
+    for(const n of nodes){
+      const sel=n===selectedNode,hov=n===hover.node;
+      ctx.save();
+      if(n.fixed){
+        ctx.fillStyle=n.kind==='road'?'#ffd36a':'#7f9bad';ctx.strokeStyle='#061019';ctx.lineWidth=3;
+        ctx.beginPath();ctx.arc(n.x,n.y,n.kind==='road'?9:8,0,Math.PI*2);ctx.fill();ctx.stroke();
+        if(n.kind==='road'){ctx.strokeStyle='rgba(255,211,106,.28)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(n.x,n.y,15,0,Math.PI*2);ctx.stroke();}
+      } else {
+        ctx.fillStyle=sel?'#51d6ff':hov?'#eafaff':'#0b1a24';ctx.strokeStyle=sel?'#b5f2ff':'#9ec2d5';ctx.lineWidth=sel?3:2;
+        ctx.beginPath();ctx.arc(n.x,n.y,sel?7:5,0,Math.PI*2);ctx.fill();ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+
+  function drawGhost(){
+    if(mode!=='build'||!selectedNode||tool==='delete')return;
+    const n=hover.node; const x=n?n.x:snap(hover.x),y=n?n.y:snap(hover.y);
+    const mat=MAT[tool];const len=Math.hypot(x-selectedNode.x,y-selectedNode.y);const okay=len<=mat.max&&budgetUsed+len/10*mat.cost<=level.budget;
+    ctx.save();ctx.setLineDash([8,7]);ctx.lineWidth=mat.width;ctx.strokeStyle=okay?mat.color:'#ff5d73';ctx.globalAlpha=.60;ctx.beginPath();ctx.moveTo(selectedNode.x,selectedNode.y);ctx.lineTo(x,y);ctx.stroke();ctx.globalAlpha=1;
+    ctx.fillStyle=okay?'#dff9ff':'#ff9dad';ctx.font='11px ui-monospace, SFMono-Regular, Menlo, monospace';ctx.fillText(`${(len/10).toFixed(1)} m  $${Math.round(len/10*mat.cost)}`,x+12,y-10);ctx.restore();
+  }
+
+  function drawCar(){
+    if(!car)return;
+    ctx.save();ctx.translate(car.x,car.y);ctx.rotate(car.angle);
+    ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=12;
+    ctx.fillStyle='#ff715b';ctx.beginPath();ctx.roundRect(-24,-15,47,20,5);ctx.fill();
+    ctx.fillStyle='#dff7ff';ctx.beginPath();ctx.roundRect(-8,-25,22,13,4);ctx.fill();
+    ctx.fillStyle='#0a1117';ctx.shadowBlur=0;for(const x of [-15,15]){ctx.beginPath();ctx.arc(x,7,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9db7c5';ctx.beginPath();ctx.arc(x,7,3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#0a1117';}
+    ctx.restore();
+  }
+
+  function drawParticles(){
+    ctx.save();for(const p of particles){ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle='#ffb65c';ctx.fillRect(p.x,p.y,3,3);}ctx.restore();
+  }
+  function updateParticles(dt){
+    for(const p of particles){p.vy+=420*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;}particles=particles.filter(p=>p.life>0);
+  }
+
+  function loop(now){
+    const frame=Math.min(.05,(now-lastFrame)/1000);lastFrame=now;accumulator+=frame;
+    const step=1/120;
+    if(mode==='simulate')while(accumulator>=step){physicsStep(step);updateParticles(step);accumulator-=step;}else{accumulator=0;updateParticles(frame);}
+    draw();requestAnimationFrame(loop);
+  }
+
+  function initLevelButtons(){
+    const grid=document.getElementById('levelGrid');grid.innerHTML='';
+    LEVELS.forEach((l,i)=>{
+      const b=document.createElement('button');b.className='level-btn'+(i===levelIndex?' active':'');b.innerHTML=`<b>0${i+1} ${l.name}</b><small>${Math.round(l.gap/10)} m span</small>`;
+      b.addEventListener('click',()=>{levelIndex=i;grid.querySelectorAll('button').forEach((x,j)=>x.classList.toggle('active',j===i));updateMission();});grid.appendChild(b);
+    });
+  }
+  function updateMission(){
+    const l=LEVELS[levelIndex];document.getElementById('mGap').textContent=Math.round(l.gap/10)+' m';document.getElementById('mBudget').textContent='$'+Math.round(l.budget/1000)+'k';document.getElementById('mLoad').textContent=(l.load/1000).toFixed(1)+' t';
+  }
+  document.getElementById('startBtn').addEventListener('click',()=>{introModal.classList.remove('show');setupLevel();flash('Tap a joint, then another point, to add a road member.','');});
+  document.getElementById('againBtn').addEventListener('click',()=>{resultModal.classList.remove('show');setupLevel();});
+
+  initLevelButtons();updateMission();resize();setupLevel();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

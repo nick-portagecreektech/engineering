@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>FLOW//ONE — One-Shot Fluid Engineering</title>
+<style>
+  :root{
+    --bg:#061019;--panel:rgba(9,22,32,.88);--panel2:rgba(12,29,42,.96);--line:rgba(255,255,255,.11);
+    --text:#eef8fc;--muted:#8fa8b6;--cyan:#4bd7ff;--blue:#4a94ff;--lime:#a7ff75;--orange:#ffb45e;
+    --red:#ff5d73;--violet:#ad8cff;--pipe:#93bed1;--duct:#aab6c3;
+  }
+  *{box-sizing:border-box} html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  button{font:inherit} #app{position:relative;width:100%;height:100%;background:radial-gradient(circle at 46% 8%,#123044 0,#07131e 43%,#03080d 100%)}
+  canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+  .topbar{position:absolute;left:0;right:0;top:0;min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;background:linear-gradient(180deg,rgba(2,8,13,.97),rgba(2,8,13,.56),transparent);pointer-events:none}
+  .brand{display:flex;align-items:center;gap:12px;min-width:0}.logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#061019;font-weight:950;font-size:13px;letter-spacing:-1px;background:linear-gradient(135deg,var(--cyan),var(--lime));box-shadow:0 8px 30px rgba(75,215,255,.22)}
+  .title{line-height:1;min-width:0}.title strong{display:block;font-size:17px;letter-spacing:.13em}.title span{display:block;margin-top:6px;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stats{display:flex;gap:8px;pointer-events:auto}.stat{min-width:102px;padding:9px 12px;border:1px solid var(--line);background:rgba(7,18,27,.76);border-radius:13px;backdrop-filter:blur(14px)}.stat b{display:block;font-size:14px}.stat small{display:block;margin-top:2px;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.1em}.stat.danger b{color:var(--red)}
+  .side{position:absolute;right:18px;top:91px;width:274px;padding:16px;border:1px solid var(--line);border-radius:17px;background:rgba(7,19,29,.77);backdrop-filter:blur(17px);box-shadow:0 18px 60px rgba(0,0,0,.18)}
+  .side h3{margin:0 0 7px;font-size:11px;letter-spacing:.16em;text-transform:uppercase}.side p{margin:0;color:var(--muted);font-size:12px;line-height:1.48}.targets{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:13px}.target{padding:9px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.035)}.target b{display:block;font-size:13px}.target small{color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:.09em}
+  .analysis{margin-top:12px;border-top:1px solid var(--line);padding-top:11px;display:grid;gap:7px}.analysis-row{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px}.analysis-row b{color:var(--text);font-weight:700}.lossbar{height:5px;border-radius:9px;background:linear-gradient(90deg,var(--lime),var(--orange),var(--red));opacity:.9}
+  .toolbar{position:absolute;left:50%;bottom:17px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;padding:8px;border:1px solid var(--line);border-radius:18px;background:var(--panel);backdrop-filter:blur(18px);box-shadow:0 20px 65px rgba(0,0,0,.38)}
+  .tool,.action{border:1px solid transparent;background:rgba(255,255,255,.045);color:var(--text);border-radius:12px;min-height:47px;padding:8px 11px;cursor:pointer;transition:.15s ease;user-select:none;-webkit-tap-highlight-color:transparent}.tool:hover,.action:hover{background:rgba(255,255,255,.09);transform:translateY(-1px)}.tool.active{border-color:rgba(75,215,255,.65);background:rgba(75,215,255,.14);box-shadow:0 0 0 3px rgba(75,215,255,.06) inset}.tool b,.action b{display:block;font-size:11px;white-space:nowrap}.tool small,.action small{display:block;margin-top:2px;font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}.dot{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;vertical-align:1px}.separator{width:1px;height:36px;background:var(--line);margin:0 1px}.action.primary{background:linear-gradient(135deg,var(--cyan),var(--lime));color:#061019;font-weight:900;padding-inline:15px}.action.warn{color:#ffd9df}.action:disabled,.tool:disabled{opacity:.35;cursor:not-allowed;transform:none}
+  .toast{position:absolute;left:50%;top:96px;transform:translate(-50%,-12px);opacity:0;pointer-events:none;max-width:min(590px,calc(100vw - 32px));padding:12px 16px;border:1px solid var(--line);border-radius:13px;background:rgba(5,15,23,.93);backdrop-filter:blur(15px);font-size:12px;text-align:center;transition:.24s ease;z-index:4}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.success{border-color:rgba(167,255,117,.48)}.toast.fail{border-color:rgba(255,93,115,.52)}
+  .modal{position:absolute;inset:0;display:none;place-items:center;padding:24px;background:rgba(2,7,11,.70);backdrop-filter:blur(10px);z-index:8}.modal.show{display:grid}.card{width:min(550px,100%);padding:27px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,rgba(14,32,45,.98),rgba(5,14,22,.99));box-shadow:0 32px 110px rgba(0,0,0,.56)}.eyebrow{color:var(--cyan);font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.card h1{margin:8px 0 10px;font-size:35px;line-height:.98;letter-spacing:-.045em}.card p{margin:0;color:var(--muted);line-height:1.55;font-size:13px}.level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:17px 0}.level-btn{padding:13px 8px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);border-radius:12px;cursor:pointer}.level-btn.active{border-color:var(--cyan);background:rgba(75,215,255,.12)}.level-btn b{display:block;font-size:12px}.level-btn small{display:block;margin-top:3px;color:var(--muted);font-size:9px}.mission{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:17px 0}.mission div{padding:12px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.035)}.mission b{display:block;font-size:16px}.mission small{color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:8px}.bigbtn{width:100%;border:0;border-radius:14px;padding:14px;background:linear-gradient(135deg,var(--cyan),var(--lime));color:#061019;font-weight:950;font-size:13px;cursor:pointer}.result-list{display:grid;gap:7px;margin:16px 0}.result-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 11px;border:1px solid var(--line);border-radius:11px;background:rgba(255,255,255,.025);font-size:11px}.result-row span{color:var(--muted)}.result-row b.ok{color:var(--lime)}.result-row b.bad{color:var(--red)}
+  .hint{position:absolute;left:18px;bottom:86px;color:rgba(220,238,246,.55);font-size:10px;letter-spacing:.04em;pointer-events:none}
+  @media(max-width:900px){.side{display:none}.stats .stat:nth-child(3){display:none}.toolbar{left:8px;right:8px;bottom:8px;transform:none;overflow-x:auto;justify-content:flex-start}.tool,.action{flex:0 0 auto}.hint{display:none}}
+  @media(max-width:580px){.topbar{padding:10px 11px}.logo{width:38px;height:38px;border-radius:12px}.title strong{font-size:13px}.title span{max-width:140px}.stats .stat:nth-child(2){display:none}.stat{min-width:84px;padding:8px 9px}.toolbar small{display:none}.tool,.action{min-height:40px;padding:8px 10px}.card{padding:21px}.card h1{font-size:29px}.level-grid{grid-template-columns:1fr}.level-btn{display:flex;justify-content:space-between;align-items:center}.level-btn small{margin:0}.mission b{font-size:13px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="game"></canvas>
+  <div class="topbar">
+    <div class="brand"><div class="logo">F//1</div><div class="title"><strong>FLOW//ONE</strong><span>One-shot fluid systems engineering</span></div></div>
+    <div class="stats">
+      <div class="stat" id="budgetStat"><b id="budgetText">$0</b><small>Budget left</small></div>
+      <div class="stat"><b id="lossText">0.0</b><small id="lossLabel">Design loss</small></div>
+      <div class="stat"><b id="statusText">BUILD</b><small>System status</small></div>
+    </div>
+  </div>
+  <aside class="side">
+    <h3 id="challengeTitle">Challenge 01</h3><p id="challengeCopy"></p>
+    <div class="targets">
+      <div class="target"><b id="targetFlow">—</b><small>Required flow</small></div>
+      <div class="target"><b id="targetPressure">—</b><small id="pressureLabel">Static head</small></div>
+    </div>
+    <div class="analysis">
+      <div class="analysis-row"><span>Connected route</span><b id="routeReadout">NO</b></div>
+      <div class="analysis-row"><span>Fittings / bends</span><b id="bendReadout">0</b></div>
+      <div class="analysis-row"><span id="moverName">Pumps installed</span><b id="moverReadout">0</b></div>
+      <div class="analysis-row"><span>Projected resistance</span><b id="resistanceReadout">—</b></div>
+      <div class="lossbar"></div>
+    </div>
+  </aside>
+  <div class="toolbar">
+    <button class="tool active" data-tool="conduit"><b><i class="dot" style="background:var(--pipe)"></i><span id="conduitTool">Pipe</span></b><small>Draw a route</small></button>
+    <button class="tool" data-tool="pump"><b><i class="dot" style="background:var(--blue)"></i>Pump</b><small>Adds liquid head</small></button>
+    <button class="tool" data-tool="fan"><b><i class="dot" style="background:var(--violet)"></i>Fan</b><small>Adds air pressure</small></button>
+    <button class="tool" data-tool="valve"><b><i class="dot" style="background:var(--orange)"></i><span id="valveTool">Valve</span></b><small>Isolation / balance</small></button>
+    <button class="tool" data-tool="filter"><b><i class="dot" style="background:var(--lime)"></i><span id="filterTool">Strainer</span></b><small>Protect equipment</small></button>
+    <button class="tool" data-tool="delete"><b>✕ Delete</b><small>Remove cells</small></button>
+    <span class="separator"></span>
+    <button class="action" id="undoBtn"><b>↶ Undo</b><small>Last change</small></button>
+    <button class="action warn" id="resetBtn"><b>Reset</b><small>Clear design</small></button>
+    <button class="action primary" id="testBtn"><b>▶ RUN TEST</b><small>Your one shot</small></button>
+  </div>
+  <div class="hint">Drag to route conduit. Place components directly on the line.</div>
+  <div class="toast" id="toast"></div>
+  <div class="modal show" id="introModal">
+    <div class="card">
+      <div class="eyebrow">Fluid systems simulation // v1.0</div>
+      <h1>Route it.<br>Power it. Test once.</h1>
+      <p>Connect the source to the process, choose the correct mover, and control system losses. Pumps do not move air. Fans do not move water. Component order can cause cavitation, contamination, or unstable operation.</p>
+      <div class="level-grid" id="levelGrid"></div>
+      <div class="mission"><div><b id="mFlow">—</b><small>Flow target</small></div><div><b id="mPressure">—</b><small>Pressure duty</small></div><div><b id="mBudget">—</b><small>Budget</small></div></div>
+      <button class="bigbtn" id="startBtn">ENTER DESIGN MODE</button>
+    </div>
+  </div>
+  <div class="modal" id="resultModal">
+    <div class="card">
+      <div class="eyebrow" id="resultEyebrow">Test complete</div><h1 id="resultTitle">System commissioned.</h1><p id="resultCopy"></p>
+      <div class="mission"><div><b id="rFlow">—</b><small>Delivered flow</small></div><div><b id="rPower">—</b><small>Input power</small></div><div><b id="rScore">0</b><small>Score</small></div></div>
+      <div class="result-list" id="resultList"></div>
+      <button class="bigbtn" id="againBtn">REDESIGN SYSTEM</button>
+    </div>
+  </div>
+</div>
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const canvas=$('#game'),ctx=canvas.getContext('2d');
+const ui={budgetText:$('#budgetText'),budgetStat:$('#budgetStat'),lossText:$('#lossText'),lossLabel:$('#lossLabel'),statusText:$('#statusText'),challengeTitle:$('#challengeTitle'),challengeCopy:$('#challengeCopy'),targetFlow:$('#targetFlow'),targetPressure:$('#targetPressure'),pressureLabel:$('#pressureLabel'),routeReadout:$('#routeReadout'),bendReadout:$('#bendReadout'),moverName:$('#moverName'),moverReadout:$('#moverReadout'),resistanceReadout:$('#resistanceReadout'),conduitTool:$('#conduitTool'),valveTool:$('#valveTool'),filterTool:$('#filterTool'),toast:$('#toast'),intro:$('#introModal'),result:$('#resultModal'),levelGrid:$('#levelGrid'),start:$('#startBtn'),test:$('#testBtn'),undo:$('#undoBtn'),reset:$('#resetBtn'),again:$('#againBtn')};
+const COLS=14,ROWS=8;
+const COST={conduit:240,pump:3400,fan:2950,valve:700,filter:900};
+const LEVELS=[
+ {name:'Lift Station',tag:'Water',medium:'water',source:'BASIN',sink:'PROCESS',sourceRow:5,sinkRow:2,target:900,unit:'GPM',pressure:28,pressureUnit:'ft',pressureName:'Static head',budget:12500,mover:'pump',requiredMovers:1,moverPressure:62,designFlow:1250,maxPressure:95,baseLoss:6,cellLoss:.55,bendLoss:1.8,valveLoss:2.4,filterLoss:4.8,npsha:13,npshr:4.5,requiresValve:true,requiresFilter:false,copy:'Feed cooling water from the basin to an elevated process. Keep the pump near the source, avoid suction-side restrictions, and provide an isolation valve.',obstacles:[[4,0],[4,1],[4,2],[8,4],[8,5],[8,6],[11,0],[11,1]]},
+ {name:'Paint Exhaust',tag:'Air',medium:'air',source:'BOOTH',sink:'STACK',sourceRow:4,sinkRow:1,target:7200,unit:'CFM',pressure:.4,pressureUnit:'in.w.g.',pressureName:'Outlet duty',budget:11800,mover:'fan',requiredMovers:1,moverPressure:5.2,designFlow:9000,maxPressure:8,baseLoss:.5,cellLoss:.10,bendLoss:.35,valveLoss:.55,filterLoss:1.45,requiresValve:false,requiresFilter:true,copy:'Pull contaminated air from the paint booth through filtration and discharge it to the stack. Put the fan on the clean side of the filter when practical.',obstacles:[[3,0],[3,1],[3,2],[6,5],[6,6],[6,7],[10,2],[10,3],[10,4],[12,5],[12,6]]},
+ {name:'Process Transfer',tag:'Water+',medium:'water',source:'DAY TANK',sink:'REACTOR',sourceRow:6,sinkRow:1,target:1250,unit:'GPM',pressure:42,pressureUnit:'ft',pressureName:'Static head',budget:17800,mover:'pump',requiredMovers:2,moverPressure:58,designFlow:1100,maxPressure:125,baseLoss:8,cellLoss:.70,bendLoss:2.2,valveLoss:2.2,filterLoss:5.5,npsha:14,npshr:5,requiresValve:true,requiresFilter:true,copy:'Supply a high-elevation reactor through a protected process line. One pump cannot meet duty; use staged pumping without exceeding the pressure limit.',obstacles:[[2,0],[2,1],[5,3],[5,4],[5,5],[7,0],[7,1],[7,2],[9,5],[9,6],[9,7],[12,2],[12,3]]}
+];
+let W=0,H=0,DPR=1,grid={x:0,y:0,cw:48,ch:48,w:0,h:0};
+let levelIndex=0,level=LEVELS[0],cells=new Map(),history=[],tool='conduit',mode='build',route=[],metrics=null,simT=0,lastTime=0,painting=false,lastPaint='',toastTimer=0,hoverCell=null;
+const key=(c,r)=>`${c},${r}`; const parse=k=>k.split(',').map(Number); const isObstacle=(c,r)=>level.obstacles.some(o=>o[0]===c&&o[1]===r);
+function fmtMoney(n){return (n<0?'−':'')+'$'+Math.abs(Math.round(n)).toLocaleString()}
+function setLevel(i){levelIndex=i;level=LEVELS[i];cells=new Map();history=[];route=[];metrics=null;mode='build';simT=0;tool='conduit';syncTools();updateLevelUI();updateStats();}
+function updateLevelUI(){
+ ui.challengeTitle.textContent=`Challenge ${String(levelIndex+1).padStart(2,'0')} // ${level.name}`;ui.challengeCopy.textContent=level.copy;
+ ui.targetFlow.textContent=`${level.target.toLocaleString()} ${level.unit}`;ui.targetPressure.textContent=`${level.pressure} ${level.pressureUnit}`;ui.pressureLabel.textContent=level.pressureName;
+ ui.conduitTool.textContent=level.medium==='water'?'Pipe':'Duct';ui.valveTool.textContent=level.medium==='water'?'Valve':'Damper';ui.filterTool.textContent=level.medium==='water'?'Strainer':'Filter';
+ ui.moverName.textContent=level.medium==='water'?'Pumps installed':'Fans installed';ui.lossLabel.textContent=level.medium==='water'?'Design loss (ft)':'Design loss (in.w.g.)';
+ $('#mFlow').textContent=`${level.target.toLocaleString()} ${level.unit}`;$('#mPressure').textContent=`${level.pressure} ${level.pressureUnit}`;$('#mBudget').textContent=fmtMoney(level.budget);
+ }
+function buildLevelButtons(){ui.levelGrid.innerHTML='';LEVELS.forEach((l,i)=>{const b=document.createElement('button');b.className='level-btn'+(i===levelIndex?' active':'');b.innerHTML=`<b>${l.name}</b><small>${l.tag} · ${l.target.toLocaleString()} ${l.unit}</small>`;b.onclick=()=>{setLevel(i);buildLevelButtons()};ui.levelGrid.appendChild(b)})}
+function snapshot(){history.push(JSON.stringify([...cells]));if(history.length>30)history.shift();}
+function restore(s){cells=new Map(JSON.parse(s));route=[];metrics=null;updateStats();}
+function totalCost(){let n=0;for(const t of cells.values())n+=COST[t]||0;return n}
+function inGrid(c,r){return c>=0&&c<COLS&&r>=0&&r<ROWS}
+function occupied(c,r){return cells.has(key(c,r))||((c===0&&r===level.sourceRow)||(c===COLS-1&&r===level.sinkRow))}
+function cellAt(px,py){const c=Math.floor((px-grid.x)/grid.cw),r=Math.floor((py-grid.y)/grid.ch);return inGrid(c,r)?{c,r}:null}
+function center(c,r){return{x:grid.x+(c+.5)*grid.cw,y:grid.y+(r+.5)*grid.ch}}
+function canEdit(c,r){return inGrid(c,r)&&!isObstacle(c,r)&&!(c===0&&r===level.sourceRow)&&!(c===COLS-1&&r===level.sinkRow)}
+function place(c,r,t,drag=false){if(mode!=='build'||!canEdit(c,r))return;const k=key(c,r),old=cells.get(k);if(t==='delete'){if(old){if(!drag)snapshot();cells.delete(k)}}else{if(old!==t){if(!drag)snapshot();cells.set(k,t)}}route=[];metrics=null;updateStats()}
+function syncTools(){$$('.tool').forEach(b=>b.classList.toggle('active',b.dataset.tool===tool))}
+function neighbors(c,r){return[[c+1,r],[c-1,r],[c,r+1],[c,r-1]].filter(([x,y])=>inGrid(x,y)&&occupied(x,y))}
+function findRoute(){const start=key(0,level.sourceRow),goal=key(COLS-1,level.sinkRow),q=[start],prev=new Map([[start,null]]);while(q.length){const k=q.shift();if(k===goal)break;const[c,r]=parse(k);for(const[nc,nr]of neighbors(c,r)){const nk=key(nc,nr);if(!prev.has(nk)){prev.set(nk,k);q.push(nk)}}}if(!prev.has(goal))return[];const p=[];for(let k=goal;k;k=prev.get(k))p.push(k);return p.reverse()}
+function bendCount(path){let b=0;for(let i=2;i<path.length;i++){const a=parse(path[i-2]),m=parse(path[i-1]),z=parse(path[i]);if((m[0]-a[0])!==(z[0]-m[0])||(m[1]-a[1])!==(z[1]-m[1]))b++}return b}
+function countTypes(path){const o={conduit:0,pump:0,fan:0,valve:0,filter:0};for(const k of path){const t=cells.get(k);if(t)o[t]++}return o}
+function projected(){const p=findRoute();if(!p.length)return{path:[],bends:0,types:{conduit:0,pump:0,fan:0,valve:0,filter:0},loss:0};const bends=bendCount(p),types=countTypes(p),length=Math.max(0,p.length-2);let loss=level.baseLoss+length*level.cellLoss+bends*level.bendLoss+types.valve*level.valveLoss+types.filter*level.filterLoss;if(level.medium==='water')loss+=types.fan*8;else loss+=types.pump*3.5;return{path:p,bends,types,loss,length}}
+function evaluate(){
+ const d=projected(),t=d.types,correct=t[level.mover],wrong=level.medium==='water'?t.fan:t.pump,cost=totalCost();let flow=0,power=0,eff=0,pressure=correct*level.moverPressure,cavMargin=99,cleanSide=true,stable=true;
+ if(d.path.length&&correct){
+   if(level.medium==='water'){
+     const net=Math.max(0,pressure-level.pressure);flow=level.target*Math.sqrt(net/Math.max(.01,d.loss));flow=Math.min(flow,level.target*1.85);
+     const first=d.path.findIndex(k=>cells.get(k)==='pump');let preLoss=0,preBends=0;for(let i=1;i<first;i++){const tt=cells.get(d.path[i]);preLoss+=level.cellLoss*(tt?1:0);if(tt==='valve')preLoss+=2.8;if(tt==='filter')preLoss+=6.2}if(first>2)preBends=bendCount(d.path.slice(0,first+1));cavMargin=level.npsha-level.npshr-preLoss-preBends*1.35;
+     const ratio=flow/Math.max(1,correct*level.designFlow);eff=Math.max(.42,.84-Math.abs(ratio-.82)*.35-(correct>level.requiredMovers?0.04:0));power=(flow*Math.max(1,pressure))/(3960*eff);
+   }else{
+     const system=Math.max(.05,level.pressure+d.loss);flow=level.target*Math.sqrt(pressure/system);flow=Math.min(flow,level.target*1.85);const ratio=flow/Math.max(1,correct*level.designFlow);eff=Math.max(.38,.76-Math.abs(ratio-.78)*.30);power=(flow*Math.max(.1,pressure))/(6356*eff);
+     const fi=d.path.findIndex(k=>cells.get(k)==='filter'),fa=d.path.findIndex(k=>cells.get(k)==='fan');cleanSide=fi<0||fa<0||fa>fi;stable=ratio>.42&&ratio<1.22;
+   }
+ }
+ const checks=[
+  {label:'Continuous source-to-process route',ok:d.path.length>0},
+  {label:`Correct ${level.mover} capacity (${correct}/${level.requiredMovers} minimum)`,ok:correct>=level.requiredMovers&&wrong===0},
+  {label:`Delivered flow ≥ 95% of target`,ok:flow>=level.target*.95},
+  {label:`Maximum pressure ≤ ${level.maxPressure} ${level.pressureUnit}`,ok:pressure<=level.maxPressure},
+  {label:'Design remains within budget',ok:cost<=level.budget}
+ ];
+ if(level.requiresValve)checks.push({label:`Isolation ${level.medium==='water'?'valve':'damper'} installed`,ok:t.valve>0});
+ if(level.requiresFilter)checks.push({label:`Protective ${level.medium==='water'?'strainer':'filter'} installed`,ok:t.filter>0});
+ if(level.medium==='water')checks.push({label:`NPSH margin positive (${cavMargin.toFixed(1)} ft)`,ok:cavMargin>=0});else checks.push({label:'Fan operating point stable',ok:stable});
+ const pass=checks.every(c=>c.ok);const costRatio=cost/level.budget;let score=Math.round(1000-(Math.max(0,costRatio-.55)*340)-Math.abs(flow/level.target-1)*190-Math.max(0,d.bends-4)*14-(wrong*180));if(level.medium==='air'&&!cleanSide)score-=90;if(!pass)score=Math.min(score,620);score=Math.max(0,score);
+ return{...d,cost,correct,wrong,flow,power,eff,pressure,cavMargin,cleanSide,stable,checks,pass,score};
+}
+function updateStats(){const cost=totalCost(),left=level.budget-cost,d=projected();ui.budgetText.textContent=fmtMoney(left);ui.budgetStat.classList.toggle('danger',left<0);ui.lossText.textContent=d.path.length?d.loss.toFixed(level.medium==='water'?1:2):'—';ui.routeReadout.textContent=d.path.length?'YES':'NO';ui.routeReadout.style.color=d.path.length?'var(--lime)':'var(--red)';ui.bendReadout.textContent=d.bends;ui.moverReadout.textContent=d.types[level.mover]||0;ui.resistanceReadout.textContent=d.path.length?`${d.loss.toFixed(level.medium==='water'?1:2)} ${level.pressureUnit}`:'—';ui.statusText.textContent=mode==='build'?'BUILD':mode==='sim'?'TESTING':'LOCKED';ui.test.disabled=mode!=='build';ui.undo.disabled=mode!=='build'||history.length===0;$$('.tool').forEach(b=>b.disabled=mode!=='build');}
+function showToast(text,type=''){clearTimeout(toastTimer);ui.toast.textContent=text;ui.toast.className='toast show '+type;toastTimer=setTimeout(()=>ui.toast.className='toast',2600)}
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);const maxW=Math.min(W-40,W<900?W-28:W-330);const maxH=Math.min(H-175,500);const cw=Math.max(28,Math.min(58,maxW/COLS,maxH/ROWS));grid.w=cw*COLS;grid.h=cw*ROWS;grid.cw=grid.ch=cw;grid.x=Math.max(14,(W-grid.w-(W>=900?290:0))/2);grid.y=Math.max(92,(H-grid.h-60)/2);}
+function roundedRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function drawBackground(){ctx.clearRect(0,0,W,H);const g=ctx.createRadialGradient(W*.43,H*.22,20,W*.43,H*.22,Math.max(W,H)*.7);g.addColorStop(0,'#123247');g.addColorStop(.46,'#081722');g.addColorStop(1,'#03080d');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.strokeStyle='rgba(255,255,255,.025)';ctx.lineWidth=1;for(let x=0;x<W;x+=34){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=34){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}}
+function drawGrid(){ctx.save();for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const p=center(c,r);if(isObstacle(c,r)){ctx.fillStyle='rgba(2,7,11,.78)';roundedRect(p.x-grid.cw*.43,p.y-grid.ch*.43,grid.cw*.86,grid.ch*.86,8);ctx.fill();ctx.strokeStyle='rgba(255,180,94,.18)';ctx.stroke();ctx.strokeStyle='rgba(255,180,94,.12)';for(let k=-1;k<3;k++){ctx.beginPath();ctx.moveTo(p.x-grid.cw*.35+k*15,p.y+grid.ch*.35);ctx.lineTo(p.x-grid.cw*.05+k*15,p.y-grid.ch*.35);ctx.stroke()}}else{ctx.fillStyle='rgba(180,222,238,.16)';ctx.beginPath();ctx.arc(p.x,p.y,1.4,0,Math.PI*2);ctx.fill()}}
+ ctx.restore();}
+function connectionDirs(c,r){return[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>occupied(c+dx,r+dy))}
+function pressureColor(i,n){const q=n<2?0:i/(n-1);if(q<.55)return level.medium==='water'?`rgba(75,${Math.round(196+q*60)},255,.96)`:`rgba(${Math.round(150+q*55)},190,255,.96)`;return q<.82?'rgba(255,184,85,.96)':'rgba(255,102,118,.96)'}
+function drawConduitCell(c,r,t,routeIndex=-1){const p=center(c,r),dirs=connectionDirs(c,r),active=mode==='sim'&&routeIndex>=0;ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=level.medium==='water'?Math.max(8,grid.cw*.19):Math.max(11,grid.cw*.25);ctx.strokeStyle=active?pressureColor(routeIndex,route.length):(level.medium==='water'?'#7faec2':'#8896a4');for(const[dX,dY]of dirs){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+dX*grid.cw*.54,p.y+dY*grid.ch*.54);ctx.stroke()}ctx.lineWidth=2;ctx.strokeStyle='rgba(230,248,255,.38)';for(const[dX,dY]of dirs){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x+dX*grid.cw*.50,p.y+dY*grid.ch*.50);ctx.stroke()}if(t==='pump')drawPump(p.x,p.y);else if(t==='fan')drawFan(p.x,p.y);else if(t==='valve')drawValve(p.x,p.y);else if(t==='filter')drawFilter(p.x,p.y);ctx.restore()}
+function drawPump(x,y){const r=grid.cw*.28;ctx.fillStyle='#163d75';ctx.strokeStyle='#66a9ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#b9d8ff';ctx.beginPath();ctx.moveTo(x-r*.38,y-r*.48);ctx.lineTo(x+r*.55,y);ctx.lineTo(x-r*.38,y+r*.48);ctx.closePath();ctx.fill();ctx.fillStyle='#66a9ff';ctx.fillRect(x-r*.11,y-r*1.05,r*.22,r*.45)}
+function drawFan(x,y){const r=grid.cw*.29;ctx.fillStyle='#2b2054';ctx.strokeStyle='#b195ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.translate(x,y);const spin=mode==='sim'?simT*5:0;ctx.rotate(spin);ctx.fillStyle='#d7ccff';for(let i=0;i<4;i++){ctx.rotate(Math.PI/2);ctx.beginPath();ctx.ellipse(r*.25,-r*.36,r*.16,r*.38,.45,0,Math.PI*2);ctx.fill()}ctx.setTransform(DPR,0,0,DPR,0,0)}
+function drawValve(x,y){const s=grid.cw*.22;ctx.fillStyle='#ffb45e';ctx.strokeStyle='#6f3f12';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x-s,y-s*.8);ctx.lineTo(x,y);ctx.lineTo(x-s,y+s*.8);ctx.closePath();ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(x+s,y-s*.8);ctx.lineTo(x,y);ctx.lineTo(x+s,y+s*.8);ctx.closePath();ctx.fill();ctx.stroke();ctx.strokeStyle='#ffd7a6';ctx.beginPath();ctx.moveTo(x,y-s*.9);ctx.lineTo(x,y-s*1.45);ctx.moveTo(x-s*.45,y-s*1.45);ctx.lineTo(x+s*.45,y-s*1.45);ctx.stroke()}
+function drawFilter(x,y){const w=grid.cw*.46,h=grid.ch*.52;ctx.fillStyle='#284735';ctx.strokeStyle='#a7ff75';ctx.lineWidth=2;ctx.fillRect(x-w/2,y-h/2,w,h);ctx.strokeRect(x-w/2,y-h/2,w,h);ctx.strokeStyle='rgba(210,255,190,.7)';ctx.lineWidth=1;for(let k=-2;k<=2;k++){ctx.beginPath();ctx.moveTo(x-w/2,y+k*h/5);ctx.lineTo(x+w/2,y+(k+1)*h/5);ctx.stroke()}}
+function drawPorts(){drawPort(0,level.sourceRow,true);drawPort(COLS-1,level.sinkRow,false)}
+function drawPort(c,r,source){const p=center(c,r),x=source?p.x-grid.cw*.48:p.x-grid.cw*.08,w=grid.cw*.56,h=grid.ch*.78;ctx.save();ctx.fillStyle=source?(level.medium==='water'?'rgba(40,139,193,.42)':'rgba(124,89,165,.38)'):'rgba(40,52,61,.95)';ctx.strokeStyle=source?'rgba(92,220,255,.75)':'rgba(196,226,238,.55)';ctx.lineWidth=2;roundedRect(x,p.y-h/2,w,h,8);ctx.fill();ctx.stroke();if(level.medium==='water'&&source){ctx.fillStyle='rgba(75,215,255,.62)';ctx.fillRect(x+4,p.y+h*.08,w-8,h*.28);ctx.strokeStyle='rgba(220,249,255,.8)';ctx.beginPath();ctx.moveTo(x+4,p.y+h*.08);for(let q=0;q<w-8;q+=8)ctx.quadraticCurveTo(x+4+q+4,p.y+h*.02,x+4+q+8,p.y+h*.08);ctx.stroke()}else if(source){ctx.strokeStyle='rgba(210,195,255,.8)';for(let q=-1;q<=1;q++){ctx.beginPath();ctx.moveTo(x+8,p.y+q*8);ctx.lineTo(x+w-8,p.y+q*8);ctx.stroke()}}ctx.fillStyle='#eaf8fd';ctx.font=`700 ${Math.max(7,grid.cw*.13)}px system-ui`;ctx.textAlign=source?'right':'left';ctx.textBaseline='middle';ctx.fillText(source?level.source:level.sink,source?x-7:x+w+7,p.y);ctx.restore()}
+function drawCells(){const routeMap=new Map(route.map((k,i)=>[k,i]));for(const[k,t]of cells){const[c,r]=parse(k);drawConduitCell(c,r,t,routeMap.has(k)?routeMap.get(k):-1)}if(hoverCell&&mode==='build'&&canEdit(hoverCell.c,hoverCell.r)){const p=center(hoverCell.c,hoverCell.r);ctx.strokeStyle='rgba(75,215,255,.55)';ctx.lineWidth=2;roundedRect(p.x-grid.cw*.38,p.y-grid.ch*.38,grid.cw*.76,grid.ch*.76,8);ctx.stroke()}}
+function routePoints(){return route.map(k=>{const[c,r]=parse(k);return center(c,r)})}
+function pointAlong(points,t){if(points.length<2)return points[0]||{x:0,y:0};const total=points.length-1,s=Math.max(0,Math.min(.9999,t))*total,i=Math.floor(s),f=s-i,a=points[i],b=points[i+1];return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f}}
+function drawFlow(){if(mode!=='sim'||!route.length)return;const pts=routePoints(),count=level.medium==='water'?18:28;for(let i=0;i<count;i++){const t=(simT*.34+i/count)%1,p=pointAlong(pts,t);ctx.fillStyle=level.medium==='water'?'rgba(150,235,255,.92)':'rgba(218,202,255,.78)';ctx.beginPath();ctx.arc(p.x,p.y,level.medium==='water'?3.2:2.2,0,Math.PI*2);ctx.fill()}const prog=Math.min(1,simT/4.2);const gp=pointAlong(pts,prog*.98);ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(gp.x,gp.y,8+Math.sin(simT*8)*2,0,Math.PI*2);ctx.stroke()}
+function drawGauges(){if(mode!=='sim'||!metrics)return;const x=grid.x+grid.w*.48,y=grid.y-27,w=Math.min(320,grid.w*.52),h=9;ctx.fillStyle='rgba(255,255,255,.08)';roundedRect(x-w/2,y,w,h,7);ctx.fill();const p=Math.min(1,(simT/3.5))*(metrics.flow/level.target);const fill=Math.min(1.2,p);const grad=ctx.createLinearGradient(x-w/2,0,x+w/2,0);grad.addColorStop(0,'#4bd7ff');grad.addColorStop(.78,'#a7ff75');grad.addColorStop(1,'#ff5d73');ctx.fillStyle=grad;roundedRect(x-w/2,y,w*Math.min(1,fill),h,7);ctx.fill();ctx.fillStyle='rgba(235,248,252,.75)';ctx.font='700 9px system-ui';ctx.textAlign='center';ctx.fillText(`${Math.round(metrics.flow*Math.min(1,simT/3.5)).toLocaleString()} / ${level.target.toLocaleString()} ${level.unit}`,x,y-7)}
+function draw(){drawBackground();drawGrid();drawPorts();drawCells();drawFlow();drawGauges();requestAnimationFrame(draw)}
+function startTest(){if(mode!=='build')return;snapshot();metrics=evaluate();route=metrics.path;mode='sim';simT=0;lastTime=performance.now();updateStats();showToast(route.length?`${level.medium==='water'?'Priming line':'Starting ventilation'}… instrumentation is live.`:'No continuous route. The test will record zero flow.','');requestAnimationFrame(stepSim)}
+function stepSim(now){if(mode!=='sim')return;const dt=Math.min(.04,(now-lastTime)/1000||.016);lastTime=now;simT+=dt;if(simT>=5){mode='locked';updateStats();showResult();return}requestAnimationFrame(stepSim)}
+function showResult(){const m=metrics;$('#resultEyebrow').textContent=m.pass?'Commissioning accepted':'Commissioning rejected';$('#resultTitle').textContent=m.pass?'System commissioned.':'Duty point missed.';let extra='';if(level.medium==='water'&&m.cavMargin<0)extra=' The pump cavitated because suction losses exceeded the available NPSH.';else if(m.wrong)extra=` A ${level.medium==='water'?'fan cannot generate liquid head':'pump cannot generate useful duct pressure'}.`;else if(level.medium==='air'&&!m.cleanSide)extra=' The fan is on the dirty side of the filter, increasing maintenance exposure.';$('#resultCopy').textContent=(m.pass?'The system reached its required operating point within the engineering constraints.':'The one-shot test exposed at least one design constraint that prevents certification.')+extra;$('#rFlow').textContent=`${Math.round(m.flow).toLocaleString()} ${level.unit}`;$('#rPower').textContent=`${m.power.toFixed(1)} hp`;$('#rScore').textContent=m.score.toLocaleString();const list=$('#resultList');list.innerHTML='';m.checks.forEach(c=>{const d=document.createElement('div');d.className='result-row';d.innerHTML=`<span>${c.label}</span><b class="${c.ok?'ok':'bad'}">${c.ok?'PASS':'FAIL'}</b>`;list.appendChild(d)});ui.result.classList.add('show')}
+function resetDesign(){cells.clear();history=[];route=[];metrics=null;mode='build';simT=0;updateStats();showToast('Design board cleared.','')}
+function eventPos(e){const r=canvas.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return{x:p.clientX-r.left,y:p.clientY-r.top}}
+function handlePaint(e,initial){const p=eventPos(e),c=cellAt(p.x,p.y);hoverCell=c;if(!c)return;const k=key(c.c,c.r);if(!initial&&k===lastPaint)return;if(initial)snapshot();lastPaint=k;if(tool==='conduit'||tool==='delete')place(c.c,c.r,tool,true);else if(initial)place(c.c,c.r,tool,true)}
+canvas.addEventListener('pointerdown',e=>{if(mode!=='build')return;painting=true;lastPaint='';canvas.setPointerCapture(e.pointerId);handlePaint(e,true)});canvas.addEventListener('pointermove',e=>{const p=eventPos(e);hoverCell=cellAt(p.x,p.y);if(painting&&(tool==='conduit'||tool==='delete'))handlePaint(e,false)});canvas.addEventListener('pointerup',e=>{painting=false;lastPaint='';try{canvas.releasePointerCapture(e.pointerId)}catch(_){}});canvas.addEventListener('pointerleave',()=>{hoverCell=null;painting=false});
+$$('.tool').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;syncTools()});ui.undo.onclick=()=>{if(history.length)restore(history.pop())};ui.reset.onclick=resetDesign;ui.test.onclick=startTest;ui.again.onclick=()=>{ui.result.classList.remove('show');mode='build';route=[];metrics=null;updateStats()};ui.start.onclick=()=>{ui.intro.classList.remove('show');showToast(level.medium==='water'?'Keep suction piping short and unrestricted.':'Filter first, fan on the clean side.','')};window.addEventListener('resize',resize);
+buildLevelButtons();setLevel(0);resize();draw();
+})();
+</script>
+</body>
+</html>
