@@ -1,0 +1,175 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101b1d"><meta name="description" content="Three valves. One overloaded pump. Keep your cool in a quick, touch-friendly pressure-balancing game."><title>Pressure Panic</title><style>@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+:root{color-scheme:dark;--bg:#101b1d;--paper:#eff1d9;--muted:#90a6a2;--lime:#d4ed57;--cyan:#75d8c8;--red:#ff775f;--line:#344744}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% 0,#2d4140 0,transparent 65%),#101b1d;color:var(--paper);font-family:'IBM Plex Mono',monospace;font-size:12px;min-height:100svh}
+button,a{-webkit-tap-highlight-color:transparent}
+button{font:inherit;cursor:pointer;color:inherit;border:1px solid var(--line);background:#1d2b2c;border-radius:5px;touch-action:manipulation}
+button:disabled{cursor:default;opacity:.48}
+button:focus-visible,a:focus-visible{outline:3px solid var(--lime);outline-offset:4px}
+button:hover:not(:disabled){filter:brightness(1.15)}
+.console{width:min(780px,100%);padding:24px 28px 26px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px}
+.back{color:var(--muted);text-decoration:none;letter-spacing:.1em}
+.tools{display:flex;gap:7px}
+.tools button{padding:9px 12px;font-size:10px}
+.title{display:flex;align-items:center;justify-content:space-between}
+.eyebrow{font-size:10px;letter-spacing:.14em;color:var(--cyan);margin:0 0 9px}
+h1{font-family:'Barlow Condensed',Impact,sans-serif;font-weight:800;font-size:clamp(55px,10vw,83px);line-height:.83;letter-spacing:-.025em;margin:0}
+h1>span{display:block;color:var(--lime)}
+.bolt{color:var(--cyan);font-size:.7em;margin-left:18px}
+.stamp{font-size:11px;line-height:1.6;color:var(--muted);border-left:1px solid var(--line);padding-left:18px}
+.stamp b{color:var(--paper)}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;margin:28px 0 18px;border-block:1px solid var(--line);padding:14px 0}
+.stats>div{padding-left:20px;border-left:1px solid var(--line)}
+.stats>div:first-child{padding-left:0;border:0}
+small{font-size:9px;letter-spacing:.06em;color:var(--muted);display:block}
+.stats strong{display:block;font-size:27px;font-weight:500;margin-top:2px}
+.stats>div:first-child strong{color:var(--lime)}
+.plant{padding:18px;background:#142224;border:1px solid #42544f;border-radius:10px;box-shadow:0 16px 50px #0004}
+.pump{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:#223233;padding:9px 13px;border-radius:6px}
+.pump b{font-size:12px;letter-spacing:.05em}
+.rotor{font-size:33px;color:var(--cyan);line-height:1}
+.running .rotor{animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}
+}
+.live{margin-left:auto;font-size:10px;color:var(--muted)}
+.running .live{color:var(--lime)}
+.manifold{height:24px;border-top:5px solid #536d67;display:flex;justify-content:space-around;margin:16px 15.7% 0;position:relative}
+.manifold:before{content:'';height:17px;width:5px;background:#536d67;position:absolute;left:calc(50% - 2px);top:-21px}
+.manifold i{position:absolute;top:0;width:5px;height:24px;background:#536d67}
+.manifold i:first-child{left:0}
+.manifold i:last-child{right:0}
+.tanks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.tank{background:linear-gradient(135deg,#263a38,#1c2c2c);border:1px solid #49605a;border-radius:8px;padding:12px 10px 10px;text-align:center;transition:border-color .2s}
+.tank.warning{border-color:var(--red)}
+.tank-head{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.tank-head b{color:var(--paper)}
+.gauge{height:153px;position:relative;margin:10px 0 7px;border:1px solid #52675d;background:#101b1d;border-radius:5px;overflow:hidden}
+.safe{position:absolute;inset:25% 0;background:#24493e;border-block:1px dashed #91bd71;z-index:1}
+.safe:before{content:'SAFE';position:absolute;right:6px;top:4px;font-size:8px;color:#b7df9566}
+.water{position:absolute;bottom:0;width:100%;background:linear-gradient(0deg,#3c8c80aa,#75d8c899);border-top:2px solid var(--cyan)}
+.warning .water{background:linear-gradient(0deg,#9f4439aa,#ff775f99);border-color:var(--red)}
+.reading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:43px;color:var(--paper);z-index:2;text-shadow:0 2px 7px #000;font-weight:500}
+.integrity-label{font-size:8px;display:flex;justify-content:space-between;color:var(--muted)}
+.integrity{height:4px;background:#0b1516;margin:5px 0 11px;border-radius:2px;overflow:hidden}
+.integrity i{display:block;height:100%;background:var(--lime)}
+.warning .integrity i{background:var(--red)}
+.valve{width:100%;height:86px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#142123}
+.wheel{height:38px;width:38px;border:4px solid #7b9188;border-radius:50%;position:relative;transition:transform .18s}
+.wheel:before,.wheel:after{content:'';position:absolute;top:13px;left:0;width:30px;height:4px;background:#7b9188}
+.wheel:after{transform:rotate(90deg)}
+.valve.open{border-color:var(--cyan);background:#1b3a35}
+.open .wheel{border-color:var(--cyan);transform:rotate(45deg)}
+.open .wheel:before,.open .wheel:after{background:var(--cyan)}
+.valve-label{font-size:9px;letter-spacing:.07em}
+.event{display:flex;align-items:center;gap:7px;padding:15px 0 12px;font-size:10px;color:var(--lime)}
+.signal{width:6px;height:6px;background:currentColor;border-radius:50%}
+.event-note{color:var(--muted);font-size:8px;margin-left:auto}
+.event.alert{color:var(--red)}
+.emergency{display:flex;gap:16px;align-items:center;border-top:1px solid var(--line);padding-top:13px}
+.emergency button{padding:11px 13px;border-color:#8e7960;color:#f0c889;text-align:left;min-width:51%}
+.emergency small{font-size:8px;margin-top:4px;color:#b4a488}
+.emergency p{font-size:9px;color:var(--muted);line-height:1.6;margin:0}
+footer{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);padding-top:16px}
+.overlay{position:fixed;inset:0;z-index:10;background:#071112d9;backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
+.overlay[hidden]{display:none}
+.dialog{width:440px;max-width:100%;margin:auto;background:#203130;border:1px solid #627364;border-radius:12px;padding:30px;box-shadow:0 20px 90px #0009}
+h2{font:800 54px/.95 'Barlow Condensed',Impact,sans-serif;letter-spacing:-.02em;margin:12px 0 14px}
+.dialog p{color:#b9c8bc;font-size:12px;line-height:1.7}
+.dialog #instructions{border-block:1px solid #42564c;margin:20px 0;padding:16px 0;display:grid;gap:16px}
+#instructions>div{display:flex;gap:14px}
+#instructions b{color:var(--lime);font-size:16px}
+#instructions span{font-size:10px;line-height:1.5;color:#a9bcb0}
+#instructions strong{display:block;color:var(--paper);font-size:11px}
+.primary{width:100%;background:var(--lime);border:0;color:#18231c;font-weight:600;font-size:12px;padding:17px 18px;display:flex;justify-content:space-between}
+.dialog .fine{font-size:8px;text-align:center;color:var(--muted);margin-bottom:0}
+#newRun{width:100%;padding:12px;margin-top:10px}
+.paused .rotor{animation-play-state:paused}
+@media(max-width:500px){.console{padding:16px 14px 22px}
+header{margin-bottom:24px}
+.title .eyebrow{font-size:8px}
+.stamp{font-size:9px;padding-left:10px}
+.stats{margin-top:22px}
+.stats strong{font-size:23px}
+.stats>div{padding-left:12px}
+.stats small{font-size:8px}
+.plant{padding:12px}
+.tanks{gap:7px}
+.tank{padding:9px 6px}
+.gauge{height:133px}
+.reading{font-size:34px}
+.valve{height:80px}
+.event-note{display:none}
+.emergency{gap:10px}
+.emergency p{font-size:8px}
+.emergency button{padding:10px;font-size:10px;min-width:60%}
+.emergency small{font-size:7px}
+footer span:last-child{display:none}
+.dialog{padding:24px}
+h2{font-size:48px}
+.overlay{padding:16px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}
+}
+
+</style></head><body>
+<main class="console">
+<header><a href="../" class="back">← ARCADE</a><div class="tools"><button id="sound" aria-label="Enable sound" aria-pressed="false">SOUND OFF</button><button id="pause" disabled>PAUSE</button></div></header>
+<section class="title"><div><p class="eyebrow">PORTAGE CREEK / CONTROL ROOM 03</p><h1>PRESSURE<span>PANIC<span class="bolt">✦</span></span></h1></div><div class="stamp">ARCADE<br>HYDRAULICS<br><b>NO. 003</b></div></section>
+<section class="stats" aria-label="Game statistics"><div><small>SHIFT SCORE</small><strong id="score">0000</strong></div><div><small>TIME ONLINE</small><strong id="time">00:00</strong></div><div><small>PERSONAL BEST</small><strong id="best">0000</strong></div></section>
+<section class="plant" aria-label="Pressure controls"><div class="pump"><span class="rotor" aria-hidden="true">✣</span><div><small>SHARED FEED PUMP</small><b id="stage">STAGE 01</b></div><span id="live" class="live">STANDBY</span></div>
+<div class="manifold" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="tanks" id="tanks"></div>
+<div class="event"><span class="signal"></span><span id="event">SYSTEM READY</span><span class="event-note">KEEP ALL THREE IN THE GREEN</span></div>
+<div class="emergency"><button id="vent" disabled><span>↓ EMERGENCY VENT</span><small id="ventLabel">DROPS ALL THREE · 18s RECHARGE</small></button><p>Closing one valve pushes<br>more pressure into the others.</p></div>
+</section><footer><span>Tap a valve to open / close.</span><span>KEYS 1 2 3 · V VENT · P PAUSE</span></footer>
+</main>
+<div class="overlay" id="overlay"><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><span class="eyebrow" id="dialogEyebrow">YOUR SHIFT STARTS NOW</span><h2 id="dialogTitle">Keep it<br>under control.</h2><p id="dialogText">Three pressure tanks. One shared pump. How long can you keep everything flowing?</p><div id="instructions"><div><b>01</b><span><strong>Open to drain. Close to fill.</strong>Tap the three valve wheels. Every change affects the shared feed.</span></div><div><b>02</b><span><strong>Stay between 25 and 75.</strong>Outside the green zone, integrity drops. Zero integrity ends your shift.</span></div><div><b>03</b><span><strong>Watch for system events.</strong>Vent all tanks in an emergency. It takes 18 seconds to recharge.</span></div></div><button id="start" class="primary">START THE PUMP <span>→</span></button><button id="newRun" hidden>START NEW SHIFT</button><p class="fine" id="dialogFine">Fast rounds · No account · Best score saved on this device</p></section></div>
+<script>/* Pressure Panic: deliberately arcade hydraulics, not an engineering solver. */
+(function(root){
+'use strict';
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+function create(){return {time:0,score:0,stage:1,cooldown:0,over:false,event:'STEADY FLOW',tanks:[0,1,2].map((i)=>({p:48+i*3,open:false,health:100,flow:0})),nextEvent:14,eventUntil:0,eventType:0,eventTank:0};}
+function toggle(s,i){if(!s.over&&s.tanks[i])s.tanks[i].open=!s.tanks[i].open;}
+function vent(s){if(s.over||s.cooldown>0)return false;s.tanks.forEach(t=>t.p=clamp(t.p-22,0,100));s.cooldown=18;return true;}
+function step(s,dt){if(s.over)return;s.time+=dt;s.stage=1+Math.floor(s.time/20);s.cooldown=Math.max(0,s.cooldown-dt);
+if(s.time>=s.nextEvent){s.eventType=1+Math.floor(s.time/14)%3;s.eventTank=Math.floor(s.time/14)%3;s.eventUntil=s.time+7;s.nextEvent=s.time+Math.max(10,16-s.stage);}
+if(s.time>=s.eventUntil)s.eventType=0;
+s.event=s.eventType===1?'PUMP SURGE':s.eventType===2?'LINE '+('ABC'[s.eventTank])+' RESTRICTION':s.eventType===3?'DEMAND SPIKE':'STEADY FLOW';
+const closed=s.tanks.filter(t=>!t.open).length,level=Math.min(s.stage-1,10),inflow=7+level*.55+(s.eventType===1?5:0);
+s.tanks.forEach((t,i)=>{let input=inflow+(closed-1)*1.5+Math.sin(s.time*.7+i*2)*1.15;
+if(s.eventType===2&&i===s.eventTank)input-=5;
+const output=(t.open?17+level*.7:0)+(s.eventType===3?4:0);t.flow=input-output;t.p=clamp(t.p+t.flow*dt,0,100);
+const unsafe=t.p<25||t.p>75,severity=t.p<25?(25-t.p)/25:(t.p-75)/25;
+t.health=clamp(t.health+(unsafe?-(7+Math.max(0,severity)*22):4)*dt,0,100);
+if(t.health<=0)s.over=true;});
+const safe=s.tanks.filter(t=>t.p>=25&&t.p<=75).length;s.score+=dt*(5+safe*5);return s;}
+const api={create,toggle,vent,step};if(typeof module!=='undefined')module.exports=api;root.PressureEngine=api;
+})(typeof window!=='undefined'?window:globalThis);
+</script><script>'use strict';
+(()=>{
+const $=id=>document.getElementById(id),E=window.PressureEngine;
+let state=E.create(),mode='intro',last=0,best=0,sound=false,audio;
+try{best=Number(localStorage.getItem('pressure-panic-best'))||0;sound=localStorage.getItem('pressure-panic-sound')==='1';}catch{}
+const save=(k,v)=>{try{localStorage.setItem(k,String(v));}catch{}};
+$('tanks').innerHTML=state.tanks.map((_,i)=>`<article class="tank" id="tank${i}"><div class="tank-head"><b>LINE ${'ABC'[i]}</b><span>${i+1}</span></div><div class="gauge"><div class="safe"></div><div class="water" id="water${i}"></div><strong class="reading" id="p${i}">50</strong></div><div class="integrity-label"><span>INTEGRITY</span><span id="health${i}">100%</span></div><div class="integrity"><i id="bar${i}"></i></div><button class="valve" id="valve${i}" disabled aria-label="Open valve ${'ABC'[i]}" aria-pressed="false"><span class="wheel" aria-hidden="true"></span><span class="valve-label">CLOSED · FILLING</span></button></article>`).join('');
+function beep(f=320){if(!sound)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();audio.resume();const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.06,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.08);o.connect(g);g.connect(audio.destination);o.start();o.stop(audio.currentTime+.08);}catch{}}
+function audioLabel(){$('sound').textContent=sound?'SOUND ON':'SOUND OFF';$('sound').setAttribute('aria-pressed',String(sound));$('sound').setAttribute('aria-label',sound?'Disable sound':'Enable sound');}
+$('sound').onclick=()=>{sound=!sound;save('pressure-panic-sound',sound?1:0);audioLabel();beep();};audioLabel();
+function toggle(i){if(mode!=='playing')return;E.toggle(state,i);beep(state.tanks[i].open?430:270);render();}
+for(let i=0;i<3;i++)$('valve'+i).onclick=()=>toggle(i);
+$('vent').onclick=()=>{if(mode==='playing'&&E.vent(state)){beep(120);render();}};
+function start(){state=E.create();mode='playing';last=performance.now();$('overlay').hidden=true;$('pause').textContent='PAUSE';document.body.classList.remove('paused');document.body.classList.add('running');render();beep(500);}
+function pause(){if(mode!=='playing')return;mode='paused';document.body.classList.add('paused');showDialog('SHIFT PAUSED','Take a breath.','Your pressure is frozen. Pick up exactly where you left off.','RESUME THE SHIFT',false);render();}
+function resume(){if(mode!=='paused')return;mode='playing';last=performance.now();$('overlay').hidden=true;document.body.classList.remove('paused');render();}
+function showDialog(eyebrow,title,text,label,instructions){$('dialogEyebrow').textContent=eyebrow;$('dialogTitle').textContent=title;$('dialogText').textContent=text;$('start').textContent=label;$('instructions').style.display=instructions?'grid':'none';$('newRun').hidden=mode!=='paused';$('dialogFine').textContent=mode==='paused'?'The pump waits for you.':'Best score saved on this device · One more shift?';$('overlay').hidden=false;$('start').focus();}
+function finish(){mode='over';document.body.classList.remove('running');const score=Math.floor(state.score),record=score>best;best=Math.max(best,score);save('pressure-panic-best',best);showDialog(record?'NEW PERSONAL BEST':'SYSTEM SHUTDOWN','Pressure got you.',`${score} points · ${Math.floor(state.time)} seconds online · Stage ${state.stage}. ${'Line '+('ABC'[state.tanks.findIndex(t=>t.health<=0)])} lost integrity.`,'TRY ANOTHER SHIFT',false);beep(90);}
+$('start').onclick=()=>mode==='paused'?resume():start();$('newRun').onclick=start;$('pause').onclick=pause;
+document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;const k=e.key.toLowerCase();if(['1','2','3','v','p','escape'].includes(k))e.preventDefault();if('123'.includes(k)&&k.length===1)toggle(+k-1);if(k==='v')$('vent').click();if(k==='p'||k==='escape'){if(mode==='playing')pause();else if(mode==='paused')resume();}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});window.addEventListener('blur',pause);
+function render(){const playing=mode==='playing';$('score').textContent=String(Math.floor(state.score)).padStart(4,'0');$('best').textContent=String(best).padStart(4,'0');$('time').textContent=String(Math.floor(state.time/60)).padStart(2,'0')+':'+String(Math.floor(state.time%60)).padStart(2,'0');$('stage').textContent='STAGE '+String(state.stage).padStart(2,'0');$('live').textContent=playing?'● ONLINE':mode==='paused'?'● PAUSED':mode==='over'?'● OFFLINE':'STANDBY';$('pause').disabled=!playing;$('vent').disabled=!playing||state.cooldown>0;$('ventLabel').textContent=state.cooldown>0?'RECHARGING · '+Math.ceil(state.cooldown)+'s':'DROPS ALL THREE · 18s RECHARGE';$('event').textContent=mode==='intro'?'SYSTEM READY':state.event;$('event').parentElement.classList.toggle('alert',state.eventType!==0);
+state.tanks.forEach((t,i)=>{$('p'+i).textContent=Math.round(t.p);$('water'+i).style.height=t.p+'%';$('health'+i).textContent=Math.ceil(t.health)+'%';$('bar'+i).style.width=t.health+'%';$('tank'+i).classList.toggle('warning',t.p<25||t.p>75);const b=$('valve'+i);b.disabled=!playing;b.classList.toggle('open',t.open);b.setAttribute('aria-pressed',String(t.open));b.setAttribute('aria-label',(t.open?'Close':'Open')+' valve '+'ABC'[i]);b.querySelector('.valve-label').textContent=t.open?'OPEN · DRAINING':'CLOSED · FILLING';});}
+function frame(now){if(mode==='playing'){const dt=Math.min((now-last)/1000,.1);E.step(state,Math.max(0,dt));if(state.over)finish();render();}last=now;requestAnimationFrame(frame);}render();requestAnimationFrame(frame);
+window.pressurePanic={getState:()=>({mode,...JSON.parse(JSON.stringify(state)),best})};
+})();
+</script></body></html>
