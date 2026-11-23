@@ -51,7 +51,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .taunt-actions button{box-sizing:border-box;min-height:44px;padding:5px 10px;font-size:12px;letter-spacing:.01em}
 .taunt-actions button:disabled{opacity:.52}.taunt-content .taunt-note{font-size:11px;color:#bdcbbb;margin-bottom:0}
 @media screen and (max-width:375px){.taunt-setup{font-size:12px}.taunt-actions button{padding-inline:8px}}
-</style></head><body><main class="window"><div class="title"><span>❄ NORTH POLE STRIKE 3D.exe</span><span>★</span></div><header><h1>NORTH POLE STRIKE<small>3D NIGHT-SHIFT BOWLING</small></h1><button id="mute" aria-label="Enable sound">♪ OFF</button></header><section class="scores" id="scores" aria-label="Ten-frame bowling scorecard"></section><section class="stage"><canvas id="lane" width="640" height="570" tabindex="0" aria-label="Split view of the bowling lane and pin deck. Click or tap the lane, or press Space or Enter, to stop the sweeping lights and bowl in one action."></canvas><div id="elfHeckle" class="elf-heckle" role="status" aria-live="polite" aria-atomic="true" hidden><strong id="elfName"></strong><span id="elfLine"></span><small id="elfAside" class="elf-aside"></small></div><div class="overlay" id="overlay"><div class="card"><h2>THE ELVES<br>ARE ON STRIKE.</h2><p>Santa has a different kind of strike in mind.<br><b>Catch a Christmas light. That’s your shot.</b><br>Ten frames. Ten cheeky elves. One big red ball.</p><button id="start">LET’S BOWL! ▶</button><small>Click or tap the lane, or press Space or Enter. One press aims and throws.</small></div></div></section><div class="bar"><div><strong id="message" aria-live="polite">THE NORTH POLE IS CLOSED FOR BOWLING.</strong><small id="hint">One press stops the light and throws.</small></div><button id="roll" aria-label="Stop the light and bowl" aria-keyshortcuts="Space Enter" disabled>BOWL! ▶</button></div><div class="status"><span id="turn">FRAME 1 / 10</span><span id="best">BEST 0</span></div><section class="taunt-setup" aria-label="Original Elf Bowling recordings">
+</style></head><body><main class="window"><div class="title"><span>❄ NORTH POLE STRIKE 3D.exe</span><span>★</span></div><header><h1>NORTH POLE STRIKE<small>3D NIGHT-SHIFT BOWLING</small></h1><button id="mute" aria-label="Enable sound">♪ OFF</button></header><section class="scores" id="scores" aria-label="Ten-frame bowling scorecard"></section><section class="stage"><canvas id="lane" width="640" height="570" tabindex="0" aria-label="Split view of the bowling lane and pin deck. Click or tap the lane, or press Space or Enter, to stop the sweeping arrows and bowl in one action."></canvas><div id="elfHeckle" class="elf-heckle" role="status" aria-live="polite" aria-atomic="true" hidden><strong id="elfName"></strong><span id="elfLine"></span><small id="elfAside" class="elf-aside"></small></div><div class="overlay" id="overlay"><div class="card"><h2>THE ELVES<br>ARE ON STRIKE.</h2><p>Santa has a different kind of strike in mind.<br><b>Stop the direction arrow. That’s your shot.</b><br>Ten frames. Ten cheeky elves. One big red ball.</p><button id="start">LET’S BOWL! ▶</button><small>Click or tap the lane, or press Space or Enter. One press aims and throws.</small></div></div></section><div class="bar"><div><strong id="message" aria-live="polite">THE NORTH POLE IS CLOSED FOR BOWLING.</strong><small id="hint">One press stops the arrow and throws.</small></div><button id="roll" aria-label="Stop the arrow and bowl" aria-keyshortcuts="Space Enter" disabled>BOWL! ▶</button></div><div class="status"><span id="turn">FRAME 1 / 10</span><span id="best">BEST 0</span></div><section class="taunt-setup" aria-label="Original Elf Bowling recordings">
  <details id="tauntSetup">
   <summary>Original Elf Bowling taunts <span id="tauntState">Checking…</span></summary>
   <div class="taunt-content">
@@ -515,7 +515,7 @@ function world(){
  for(const x of [-4.2,4.2])for(let z=34;z<40;z+=1.5){box(id,x,.22,z,.59,.44,.69,'#a53d45');box(id,x,.45,z,.62,.09,.72,'#ca6261');box(id,x,.49,z,.12,.025,.72,'#f6bf62')}
 }
 function northElfCartoon(p,lod,A){
-const {S,LOD,limb,block,cap}=A;
+const {S,LOD,limb,block,cap,beard,curl}=A;
 const t=p.down?1:0,blink=(Math.sin(time*3.6+p.id*2.4)>.976&&!t)?.16:1;
 const act=actorBeat(p),f=act.flail,st=act.style,h=act.reach,u=act.local;
 const rd=foldRagdoll(p),character=p.id%5,sideBias=p.id%2?1:-1,rootTurn=sideBias*(character===3?.40:.17);
@@ -538,30 +538,27 @@ const ht=pose(0,.82,0,-lookFirst*.22+setback*(character===1?.35:-.29)-follow*.23
 const facesX=[1.06,1.13,.99,.93,1.14][character],facesY=[1.04,.96,1.15,1.08,.99][character];
 const head=P=>{const q=ht([P[0]*facesX,(P[1]-.81)*facesY,P[2]]);return T(shape(...q));};
 const torso=(q)=>T(shape(...q));
-const green=['#23984a','#26864a','#359e59','#217b36'][p.id%4],red=['#e83539','#ce2545','#ed4a37'][p.id%3],skin=['#f9ba95','#e5a27c','#ffd0aa','#edac82'][p.id%4],fur='#fff1d1',boots='#e4a436',metal='#ffcc52';
+const green=['#138233','#187c37','#168938','#137c31','#117838'][character],red=['#f6411b','#e93618','#ef3e18'][p.id%3],skin=['#f1b5a6','#e5a999','#f6c0ad','#e4ac9a'][p.id%4],
+ fur='#f6eeea',boots='#ffae3b',metal='#ffcc42',sock='#dd481c';
 for(const side of [-1,1]){
  const clampK=t?rd.legs:0,flail=t?rd.energy*Math.sin(rd.age*15+side*1.8):0,
  step=setback*(side===sideBias?1:0),tiptoe=Math.sin(setback*Math.PI)*step,
  a=[side*.104,.267,0],bend=[side*(.116+clampK*.05+step*.073),.151+clampK*.06+tiptoe*.12,.033+flail*.064+step*.10],
  shoe=[side*(.123+rd.catching*.046+step*(character===2?.15:.071)),.069+Math.abs(flail)*.08+clampK*.11+tiptoe*.14,-.076+flail*.10+clampK*.11+step*.16-flail*impact*.13];
- limb(T,a,bend,.074,.074,red,0,!lod);limb(T,bend,shoe,.070,.073,red,0,!lod);
- s(T,...shoe,.107,.087,.150,'#6f3e31',4);
- s(T,shoe[0],shoe[1]+.007,shoe[2]-.029,.110,.078,.173,boots,4);
- // Curl the tip upward and outward in true 3D so it silhouettes from either camera.
- for(let i=0;i<5;i+=lod?2:1){
-  const angle=i*.53,q=.042-i*.003;
-  s(T,shoe[0]+side*(.057+.094*Math.sin(angle)),shoe[1]+.025+.095*(1-Math.cos(angle)),shoe[2]-.146-.049*Math.sin(angle),q*1.18,q,q*.98,i<3?boots:metal,4);
- }
- s(T,shoe[0],shoe[1]+.072,shoe[2]+.038,.081,.029,.081,fur,2);
+ limb(T,a,bend,.069,.070,sock,0,!lod);limb(T,bend,shoe,.064,.070,sock,0,!lod);
+ s(T,...shoe,.109,.084,.146,'#6e3925',4);
+ s(T,shoe[0],shoe[1]+.006,shoe[2]-.015,.105,.079,.140,boots,4);
+ curl(T,shoe[0],shoe[1],shoe[2]-.092,side,boots,!lod);
+ s(T,shoe[0],shoe[1]+.066,shoe[2]+.011,.075,.060,.084,boots,4);
 }
-s(torso,0,.433,.005,.269,.243,.195,green);
-s(torso,0,.289,.012,.262,.120,.185,green);
-for(let i=-1;i<=1;i++)s(T,i*.135,.237,-.062,.080,.056,.089,green);
-s(torso,0,.365,0,.273,.056,.197,'#302631',4);
-s(torso,0,.369,-.203,.077,.054,.032,metal,4);s(torso,0,.369,-.235,.040,.027,.012,'#5e3730',4);
-s(torso,0,.614,-.065,.218,.056,.156,fur,2);
-for(let i=-1;i<=1;i++){const r=pose(i*.086,.577-Math.abs(i)*.009,-.121,0,0,-i*.55);s(q=>T(r(q)),0,0,0,.047,.066,.042,fur,2);}
-for(const y of [.447,.509])s(T,0,y,-.173,.021,.021,.018,metal,4);
+s(torso,0,.456,.006,.235,.224,.157,green);
+s(torso,0,.316,.007,.252,.151,.169,green);
+for(const side of [-1,1]){
+ const lower=pose(side*.123,.264,-.013,0,0,side*.085);
+ s(q=>torso(lower(q)),0,0,0,.126,.112,.144,green);
+ const edge=pose(side*.142,.187,-.023,0,0,side*.09);
+ for(let i=-1;i<=1;i++)s(q=>torso(edge(q)),i*.046,0,0,.030,.043+(.013*(1-Math.abs(i))),.115,green);
+}
 for(const side of [-1,1]){
 const flap=t?rd.arms*(rd.style===1?side*.94:.55)+rd.catching*.69:0;
 const pointing=h&&st===1&&side>0,protest=h&&(st===4||activeBreak()),dance=h&&st===2;
@@ -570,55 +567,67 @@ const k=.047*Math.sin(u+side*1.9)+flap*.32+(t?.08:0)+(pointing?.17:0)+(protest?.
 const a=[side*.19,.554,.005],b=[side*(.29+Math.abs(k)*.22+surrender*.06+wild*.16),.44+k*.44+shield*.18+surrender*.23+wild*.15+ready*.16,.007-shield*.18+wild*.08];
 const d=[side*(.36+(t?.10:0)+(protest?.13:0)+(pointing?.06:0)-shield*.235+surrender*.10+wild*.31-peer*.15)+follow*.07,.47+k+shield*.37+surrender*(side===sideBias?.65:.46)+wild*(side===sideBias?.43:.02)+ready*.24+peer*.30+impact*.32,-.065-(pointing?.27:0)-shield*.30-surrender*.04-wild*.02-ready*.25-peer*.22];
 
-limb(T,a,b,.072,.075,green,0,!lod);limb(T,b,d,.062,.058,green,0,!lod);
+const cuff=[mix(b[0],d[0],.38),mix(b[1],d[1],.38),mix(b[2],d[2],.38)];
+limb(T,a,b,.082,.078,green,0,!lod);limb(T,b,cuff,.080,.075,green,0,!lod);limb(T,cuff,d,.050,.048,skin,1,!lod);
 if(activeBreak()&&p.id===heckler&&side<0){const br=ease((time-heckleAt)*6);block(T,d[0],d[1]+.11*br,d[2],.035,.37,.035,'#8c613f',4);block(T,d[0],d[1]+.27*br,d[2]-.022,.29,.162,.042,'#f6dba6',6);for(let t=0;t<3;t++)block(T,d[0],d[1]+.24*br+t*.025,d[2]-.046,.19-(t%2)*.03,.012,.014,'#987153',4);}
 s(T,...d,.075,.080,.066,skin,1);s(T,d[0]-side*.045,d[1]+.018,d[2]-.032,.034,.046,.033,skin,1);if(pointing)s(T,d[0],d[1]+.012,d[2]-.068,.030,.025,.086,red);
-s(T,d[0],d[1]-.031,d[2],.067,.027,.065,fur,2);
+if(!lod&&!pointing){for(let j=-1;j<=1;j++)s(T,d[0]+j*.030,d[1]-.043,d[2]-.028,.019,.039,.019,skin,1,false);}
 }
-const white='#fff5da', brow=['#3a221b','#624124','#522638','#2a2632'][p.id%4],iris=['#28a8d5','#3c9c6b','#9066bc','#377bcd'][p.id%4];
-const mood=p.id%4, grimace=t||fear>.26, screamCrew=(p.id<3||p.id===4), yelp=t?Math.max(.20,impact):(screamCrew?1:.38)*ease((fear-.26)/.51),
- squint=character===1&&fear>.55?.48:1,faceMass=[1.02,1.11,.94,.97,1.10][character];
-s(head,0,.804,-.029,.250*faceMass,.223+yelp*.025,.202,skin,1);
-s(head,0,.726,-.111,.216,.138+yelp*.02,.150,skin,1);
+const white='#fff6f1',ink='#382c32',browColor='#eee5e3';
+const mood=p.id%4, grimace=t||fear>.26, screamCrew=(p.id<3||p.id===4),
+ yelp=t?Math.max(.20,impact):(screamCrew?1:.38)*ease((fear-.26)/.51),
+ faceMass=[1.02,1.10,.95,.97,1.06][character];
+s(head,0,.812,-.035,.239*faceMass,.208,.180,skin,1);
+s(head,0,.748,-.096,.219,.111,.154,skin,1);
+beard(head,0,.52-yelp*.055,-.174,.255,.254+yelp*.061,.103,'#f5eeec',!lod);
 for(const side of [-1,1]){
- const et=pose(side*.211,.806,-.039,.20*follow,side*.33,side*(.48+[.15,-.03,.29,.06,.20][character]-.31*yelp)+follow*.22);
+ const et=pose(side*.219,.793,-.051,.16*follow,side*.24,side*(.54-.19*yelp)+follow*.19);
  const e=q=>head(et(q));
- s(e,side*.066,0,0,.156,.055,.059,skin,1);
- const tip=pose(side*.142,.047,0,0,0,side*.71);
- s(q=>e(tip(q)),side*.043,0,0,.102,.026,.039,skin,1);
- s(e,side*.057,.002,-.039,.078,.029,.021,'#d76863',1);
- if(side>0&&mood===3)s(e,.082,-.035,-.029,.025,.027,.024,metal,6,false);
- s(head,side*.154,.774,-.167,.059,.045,.037,'#ef786a',1);
- const ex=side*(.083+(mood===1?.008:0)),ey=.849+(mood===2&&side<0?.019:0)+yelp*.008;
- const width=[.075,.071,.068,.079,.076][character],eh=([.071,.049,.073,.055,.062][character]+yelp*.046)*squint*blink;
- s(head,ex,ey,-.209,width+.012,eh+.011,.045,'#422934',1);
- s(head,ex,ey,-.227,width,eh,.038,white,6,false);
- const look=(h&&st===1?.011:0)+side*(mood===3?.008:.003)+sideBias*lookFirst*.022;
- s(head,ex+look,ey-.008*yelp,-.258,.031-yelp*.012,eh*(.68-yelp*.30),.016,iris,1);
- s(head,ex+look,ey-.008*yelp,-.268,.018-yelp*.007,eh*(.53-yelp*.27),.009,'#281524',4);
- if(!lod&&blink>.3)s(head,ex+look-.012,ey+.015,-.265,.010,.011,.005,'#fffdf5',6,false);
- const bt=pose(ex,ey+eh+.025+(mood===1&&side>0?.014:0)+h*.028*Math.sin(u*4+p.id+side),-.215,0,0,side*(yelp*.48+[.19,-.36,-.11,.47,.08][character])+.20*lookFirst);
- s(q=>head(bt(q)),0,0,0,.086,[.022,.035,.025,.023,.029][character],.028,character===1?white:brow,1);
- // Cream sideburns frame the face, with a different ragged beard scallop per elf.
- s(head,side*.169,.729,-.151,.069,.089,.062,white,2);
- if(mood!==1)s(head,side*.123,.697,-.177,.059,.070,.059,white,2);
+ s(e,side*.064,0,0,.125,.070,.050,skin,1);
+ const tip=pose(side*.103,.028,0,0,0,side*.51);
+ s(q=>e(tip(q)),side*.043,.002,0,.096,.034,.034,skin,1);
+ s(e,side*.062,-.003,-.035,.089,.037,.025,'#be807c',1);
+ s(e,side*.082,.010,-.046,.057,.020,.016,'#e2a5a0',1);
+ s(head,side*.167,.756,-.178,.043,.063,.044,'#e9a393',1);
+ const ex=side*(.079+(mood===1?.007:0)),ey=.842+(mood===2&&side<0?.010:0)+yelp*.028;
+ const width=[.071,.066,.071,.076,.069][character],eh=([.049,.044,.054,.050,.050][character]+yelp*.039)*blink;
+ s(head,ex,ey,-.195,width+.008,eh+.009,.041,ink,1);
+ s(head,ex,ey-.001,-.217,width,eh,.034,white,6,false);
+ const look=(h&&st===1?.011:0)+sideBias*lookFirst*.016;
+ s(head,ex+look,ey-.006-yelp*.006,-.246,.017-yelp*.003,.024+yelp*.004,.015,'#29272d',4);
+ if(!lod&&blink>.3)s(head,ex+look-.005,ey+.002,-.259,.006,.009,.004,'#fffdf5',6,false);
+ const bt=pose(ex,ey+.047+yelp*.042+h*.019*Math.sin(u*4+p.id+side),-.207,0,0,side*(-.18+yelp*.48));
+ const raised=q=>head(bt(q));
+ s(raised,0,0,0,.077,.028,.031,ink,1);
+ s(raised,0,.009,-.020,.070,.023,.021,browColor,2);
+ const cheek=pose(side*.187,.713,-.164,0,0,side*.30);
+ s(q=>head(cheek(q)),0,0,0,.071,.085,.053,white,2);
 }
 const grin=mood===0?.100:mood===1?.104:mood===2?.085:.081, slant=grimace?0:[0,-.19,.12,.28][mood];
 const talk=h&&!grimace?(Math.abs(Math.sin(u*5.1))*.60+Math.abs(Math.sin(u*7.7+p.id))*.40):0;
 const jaw=pose(0,.710-yelp*.043-talk*.032,-.245,0,0,slant+follow*.17),mouth=q=>head(jaw(q));
-s(head,0,.681,-.163,mood===1?.147:.163,.089,.085,white,2);
-const chin=pose(mood===2?.013:0,.633,-.169,0,0,mood===2?.14:0);
-s(q=>head(chin(q)),0,-.030,0,.086,mood===1?.063:.094,.060,white,2);
-s(mouth,0,0,0,grin*(1.16-yelp*.22),.026+yelp*.102+talk*.068,.040,'#5e1d37',1);
-if(!grimace)s(mouth,mood===2?.013:0,.012,-.031,grin*.79,.015,.012,white,6,false);
-else{s(mouth,0,-.043*yelp,-.032,.058,.014+yelp*.012,.009,'#ef7c79',1);s(mouth,0,.064*yelp,-.029,.061,.013,.012,white,6,false);}
-s(head,0,.791,-.266,[.069,.097,.057,.081,.108][character],[.053,.041,.090,.051,.065][character],.073,'#e98d72',1);
-s(head,-.016,.815,-.296,.027,.014,.025,'#ffad89',1);
-s(head,0,.970,.000,.244,.047,.200,white,2);
-const tall=[.58,.438,.65,.51,.505][character],wide=[.220,.244,.181,.207,.239][character];
-const hat=pose(.0,.991,.017,-.17+setback*.26+follow*.33,sideBias*(.15+.15*lookFirst),(-.30-character*.08)+.11*Math.sin(time*4+p.id)-setback*sideBias*.33+follow*.42);
-cap(q=>head(hat(q)),0,0,0,wide,tall,.191,red,0,true);
-s(q=>head(hat(q)),wide*.98,tall*.845,0,.054,.058,.055,character%2?white:metal,character%2?2:4);
+s(mouth,0,-.010,0,grin*(1.08-yelp*.19),.020+yelp*.093+talk*.058,.034,'#512b39',1);
+if(!grimace)s(mouth,mood===2?.011:0,.006,-.024,grin*.72,.013,.011,white,6,false);
+else {s(mouth,0,-.046*yelp,-.026,.051,.014+yelp*.009,.008,'#df8c8b',1);s(mouth,0,.061*yelp,-.027,.054,.011,.009,white,6,false);}
+for(const side of [-1,1]){
+ const whisk=pose(side*.104,.731+yelp*.028,-.242,0,side*.15,-side*(.19+.10*yelp));
+ const W=q=>head(whisk(q));
+ s(W,0,0,0,.119,.041,.047,'#897b80',1);
+ s(W,0,.007,-.015,.117,.034,.042,white,2);
+ s(W,side*.093,.021,-.003,.032,.021,.031,white,2);
+}
+s(head,0,.779,-.259,.069,.047,.065,'#e7a092',1);
+s(head,-.013,.791,-.308,.022,.014,.016,'#ffb9aa',1);
+const tall=[.375,.344,.397,.359,.365][character],wide=[.229,.242,.214,.224,.235][character];
+const hat=pose(0,.950,.014,-.13+setback*.17+follow*.29,.055+sideBias*.09*lookFirst,.44+.045*character+.086*Math.sin(time*4+p.id)-setback*sideBias*.22+follow*.34);
+s(q=>head(hat(q)),0,.013,-.025,.248,.049,.176,'#574651',1);
+s(q=>head(hat(q)),0,.020,-.037,.243,.052,.174,white,2);
+// The reference cap drapes left: mirror the existing soft hat mesh instead of stretching it up.
+const flapHat=q=>head(hat([-q[0],q[1],q[2]]));
+cap(flapHat,0,.031,0,wide,tall,.191,red,0,true);
+s(flapHat,wide*.98,tall*.845+.027,0,.059,.061,.060,metal,4);
+if(!lod)s(flapHat,wide*.98,tall*.845+.019,-.053,.030,.011,.010,'#7d501e',4,false);
+
 }
 function northSantaCartoon(stride,A){
 const {S,limb,cap}=A;
@@ -688,6 +697,8 @@ function northFallbackColor(c,m){
  const colors=[shade(c,m===6?1.0:.97),shade(c,.62)];
  northFallbackColors.set(k,colors);return colors;
 }
+// Reference-faithful curled boot silhouette in local coordinates, used by both renderers.
+const NORTH_ELF_CURL=[[0,0,.048],[.075,.008,.051],[.141,.034,.049],[.187,.088,.042],[.195,.145,.035],[.169,.186,.032],[.125,.187,.028],[.099,.155,.023],[.112,.126,.019],[.140,.128,.014]];
 function northCharacterFallback(){
  const cheap=cam.split===SPLIT;
  // Perspective-project each rigged ellipsoid once, not dozens of tessellated faces.
@@ -715,7 +726,24 @@ function northCharacterFallback(){
   }
   for(let i=0;i<verts.length-1;i++)for(let j=0;j<n;j++){const k=(j+1)%n;face([verts[i][j],verts[i+1][j],verts[i+1][k],verts[i][k]],c);}
  };
- return {S,LOD:S,limb,cap,block:box};
+ const beard=(T,x,y,z,w,h,d,c)=>{
+  const ring=[[-.94,.80],[-.54,1],[.54,1],[.94,.80],[.70,.48],[.17,.15],[0,0],[-.22,.18],[-.67,.46]];
+  const p=ring.map(([u,v])=>project(T([x+u*w,y+v*h,z-(v>.75?.59:.36)*d])));
+  if(p.some(q=>!q))return;
+  const bias=p.reduce((sum,q)=>sum+q[2],0)/p.length;
+  faces.push([bias,p,northFallbackColor(c,0)[0]]);
+ };
+ const curl=(T,x,y,z,side,c)=>{
+  const n=NORTH_ELF_CURL.length,out=[],back=[];
+  for(let i=0;i<n;i++){
+   const [u,v,r]=NORTH_ELF_CURL[i],l=NORTH_ELF_CURL[Math.max(0,i-1)],h=NORTH_ELF_CURL[Math.min(i+1,n-1)],a=h[0]-l[0],b=h[1]-l[1],nrm=Math.hypot(a,b)||1;
+   out.push(project(T([x+side*(u-b*r/nrm),y+v+a*r/nrm,z])));
+   back.push(project(T([x+side*(u+b*r/nrm),y+v-a*r/nrm,z])));
+  }
+  const p=out.concat(back.reverse());if(p.some(q=>!q))return;
+  faces.push([p.reduce((sum,q)=>sum+q[2],0)/p.length,p,northFallbackColor(c,0)[0]]);
+ };
+ return {S,LOD:S,limb,cap,beard,curl,block:box};
 }
 function elf(p){northElfCartoon(p,cam.split===SPLIT,northCharacterFallback());}
 function santa(x,z,walk,swing){
@@ -745,38 +773,29 @@ function slotAt(ms){
 function resetSweep(){sweepStarted=last;sweepSlot=0;aim=-1;}
 function scanSweep(t){sweepSlot=slotAt(t-sweepStarted);aim=(sweepSlot-(LAMPS-1))/(LAMPS-1);}
 function lampPhase(lamp,slot){const d=Math.abs(lamp*2-slot);return d===0?2:d===1?1:0;}
-// The controls are unchanged: 15 sockets, 29 timing slots. Each half-step lights a pair.
-const holidayLights=[
- ['#ff6665','#6e252d'],['#8cefa6','#24583e'],['#86c5ff','#244d78'],['#ffd172','#75501f'],['#ff93e5','#662754']
-];
-function drawBulb(x,y,i,strength){
- const [hue,off]=holidayLights[i%holidayLights.length];
- g.save();g.translate(x,y);
- g.fillStyle='#133629';g.fillRect(-3.7,5.3,7.4,4.5);
- g.fillStyle='#567569';g.fillRect(-3.3,5.4,6.6,1.25);
- if(strength){g.shadowColor=hue;g.shadowBlur=strength===2?17:9;}
- g.beginPath();g.moveTo(0,-11.6);
- g.quadraticCurveTo(3.7,-8.4,5,-2.2);
- g.quadraticCurveTo(6,4.3,2.6,6.1);
- g.lineTo(-2.6,6.1);g.quadraticCurveTo(-6,4.3,-5,-2.2);
- g.quadraticCurveTo(-3.7,-8.4,0,-11.6);g.closePath();
- g.fillStyle=strength?hue:off;g.fill();
- g.shadowBlur=0;g.lineWidth=strength===2?1.7:1.1;
- g.strokeStyle=strength===2?'#fff7d2':strength===1?'#f4d193':'#ede1c880';g.stroke();
- g.fillStyle=strength===2?'#fff9df':strength===1?'#fff5cc9d':'#e9c9dd45';
- g.beginPath();g.ellipse(-1.8,-2.1,strength===2?2.2:1.1,strength===2?4.1:2.8,.25,0,R*2);g.fill();
- g.restore();
+// Original-style lane markers: fifteen sweep positions and a separate fixed center cue.
+// The center cue is not a timing position. Half-steps remain orange adjacent pairs.
+function drawDirectionMarker(x,y,strength,size=1){
+ g.save();g.translate(x,y);g.scale(size,size);
+ // Independently drawn stepped upright silhouette, rather than Christmas bulbs.
+ g.fillStyle=strength===2?'#ffff00':strength===1?'#fc4c02':'#660900';
+ g.beginPath();g.moveTo(-3,0);g.lineTo(3,0);g.lineTo(3,-4);
+ g.lineTo(2,-4);g.lineTo(2,-8);g.lineTo(1,-8);g.lineTo(1,-11);
+ g.lineTo(-1,-11);g.lineTo(-1,-8);g.lineTo(-2,-8);g.lineTo(-2,-4);
+ g.lineTo(-3,-4);g.closePath();g.fill();g.restore();
 }
 function aimHud(){
- const z=6.5,scale=SPLIT/W,old=cam;g.save();sceneCamera('lane');
- const bulbs=Array.from({length:LAMPS},(_,i)=>project([(i-7)*.274,.03,z])).map(q=>q&&[q[0]*scale,q[1]]);
- g.beginPath();bulbs.forEach((point,i)=>{if(!point)return;const [x,y]=point;if(i===0||!bulbs[i-1])g.moveTo(x-10,y+11);else g.quadraticCurveTo((x+bulbs[i-1][0])/2,y+9+(i%2===0?3:0),x,y+9);});
- const tail=bulbs[LAMPS-1];if(tail)g.lineTo(tail[0]+10,tail[1]+11);
- g.strokeStyle='#20382d';g.lineWidth=2.8;g.stroke();
- bulbs.forEach((point,i)=>{if(point)drawBulb(...point,i,lampPhase(i,sweepSlot));});
+ const scale=SPLIT/W,old=cam;g.save();sceneCamera('lane');
+ const center=project([0,.03,6.5]);
+ if(center){
+  const cx=center[0]*scale,cy=center[1],spacing=12*SPLIT/320,size=SPLIT/320;
+  // Screen-space row keeps all fifteen markers level like the original HUD.
+  for(let i=0;i<LAMPS;i++)drawDirectionMarker(cx+(i-7)*spacing,cy,lampPhase(i,sweepSlot),size);
+  drawDirectionMarker(cx,cy-15*size,0,size);
+ }
  cam=old;
  g.fillStyle='#14253be8';g.fillRect(20,516,314,37);g.strokeStyle='#e0bd7f';g.lineWidth=1;g.strokeRect(20,516,314,37);g.fillStyle='#f9dfa7';g.textAlign='center';
- g.font='900 15px Trebuchet MS';g.fillText(state==='aim'?'CATCH A LIGHT · TAP OR SPACE':'LIGHT LOCKED',177,539);g.restore();
+ g.font='900 15px Trebuchet MS';g.fillText(state==='aim'?'STOP THE ARROW · TAP OR SPACE':'DIRECTION LOCKED',177,539);g.restore();
 }
 function foldRagdoll(p){
  if(!p.down)return {x:p.x,z:p.z,y:p.y,rx:0,ry:0,rz:0,style:p.id%4,age:0,energy:0,legs:0,arms:0,catching:0};
@@ -883,7 +902,7 @@ function animationEvents(){
 function cueAudio(name,data={}){try{window.northAudio?.cue(name,data)}catch{}}
 
 function rack(){pins=[];for(let i=0;i<4;i++)for(let j=0;j<=i;j++){let x=(j-i/2)*.75,z=DECK+i*.70;pins.push({id:pins.length,x,z,y:0,vx:0,vz:0,vy:0,rx:0,ry:0,rz:0,wx:0,wz:0,down:false,moving:false})}}
-function resetTurn(){phase=0;B=null;incomingScare=null;state='aim';resetSweep();scoreUI();announce('WATCH THE CHRISTMAS LIGHTS.','Tap the lane or press Space / Enter to bowl.');nextHeckle=Math.max(nextHeckle,time+2.45)}
+function resetTurn(){phase=0;B=null;incomingScare=null;state='aim';resetSweep();scoreUI();announce('WATCH THE DIRECTION ARROWS.','Tap the lane or press Space / Enter to bowl.');nextHeckle=Math.max(nextHeckle,time+2.45)}
 function start(){frames=[[]];frame=0;shot=0;particles=[];acc=0;heckleSerial=0;laughSeen=false;heckler=-1;nextHeckle=time;captionHot=false;rack();resetTurn();$('overlay').classList.add('hidden');c.focus?.({preventScroll:true});try{window.northAudio?.mute(muted)}catch{}cueAudio('start');showHeckle(withAside('open',drawBanter('open')),pins,-1,true);sound(550,.14);}
 function bowl(){if(state!=='aim'||last-sweepStarted<SLOT_MS)return;locked=aim;state='approach';phase=0;knocked=0;nearHits=0;rollLen=0;shot++;scoreUI();announce('AIM LOCKED.','Watch Santa lift, plant and release.');cueAudio('lock');sound(180,.2,'triangle')}
 function launch(){state='roll';phase=0;B=launchBall(locked);announce('BALL AWAY!','Watch the deck.');cueAudio('release',{aim:locked});sound(180,.27,'triangle')}
@@ -1101,7 +1120,22 @@ const northCharacterGL=(()=>{
   const a=pt(i,j),b=pt(i+1,j),c=pt(i+1,j+1),d=pt(i,j+1);verts.push(...a,...b,...c,...a,...c,...d);
  }
  mesh('northFloppyCap',verts);
- return {S,LOD,limb,block:(...a)=>block(...a),cap:(...a)=>add('northFloppyCap',...a)};
+ // A pointed swept goatee (thin at the bottom, wide beneath the cheeks).
+ revolve('northElfBeard',[[0,.006],[.08,.22],[.25,.43],[.46,.70],[.69,.91],[.81,1],[.91,.89],[1,.63],[1.02,.007]],10);
+ const tube=[],N2=9,knots=NORTH_ELF_CURL;
+ function toe(i,j){
+  const [x,y,r]=knots[i],a=knots[Math.max(0,i-1)],b=knots[Math.min(i+1,knots.length-1)],n=norm(a[1]-b[1],b[0]-a[0],0),ang=j*2*R/N2,v=[n[0]*Math.cos(ang),n[1]*Math.cos(ang),Math.sin(ang)];
+  return [x+r*v[0],y+r*v[1],r*.80*v[2],...v];
+ }
+ for(let i=0;i<knots.length-1;i++)for(let j=0;j<N2;j++){
+  const a=toe(i,j),b=toe(i+1,j),c=toe(i+1,j+1),d=toe(i,j+1);tube.push(...a,...b,...c,...a,...c,...d);
+ }
+ mesh('northElfToe',tube);
+ return {S,LOD,limb,block:(...a)=>block(...a),cap:(...a)=>add('northFloppyCap',...a),
+  beard:(T,x,y,z,w,h,d,c,sh)=>add('northElfBeard',T,x,y,z,w,h,d,c,2,sh),
+  curl:(T,x,y,z,side,c,sh)=>add('northElfToe',T,x,y,z,side,1,1,c,4,sh)
+ };
+
 })();
 function elfGL(p,lod=false){northElfCartoon(p,lod,northCharacterGL);}
 function santaGL(stride){return northSantaCartoon(stride,northCharacterGL);}
