@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>North Pole Strike 3D</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>North Pole Strike 3D</title><meta name="credits" content="Original 1999 sounds: NVision Design / NStorm (unmodified game file from the Internet Archive, read locally). Santa laugh: canucklovingbrit, CC0. New taunts generated with Resemble AI Chatterbox Nano."><style>
 *{box-sizing:border-box}body{margin:0;background:#153c48;color:#17323a;font:14px 'Trebuchet MS',Arial,sans-serif;min-height:100svh;display:grid;place-items:center;padding:12px;background-image:radial-gradient(#ffffff18 1px,transparent 1px);background-size:18px 18px}.window{width:min(100%,680px);background:#d6d5ca;border:3px outset #eee;box-shadow:10px 12px 0 #0003}.title{background:linear-gradient(90deg,#193d57,#456e80);color:#fff;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;font:bold 13px monospace}.title span:last-child{background:#d6d5ca;color:#344;border:2px outset white;padding:0 5px}header{padding:13px 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}h1{font-size:24px;line-height:1;margin:0;color:#9d302b;letter-spacing:-1px}h1 small{display:block;letter-spacing:3px;font-size:9px;color:#52726d;margin-top:6px}button{font:inherit;font-weight:bold;border:2px outset #fff;background:#e9e6d6;min-height:44px;padding:8px 12px;cursor:pointer;color:#233c42}button:active{border-style:inset}button:focus-visible{outline:3px solid #ce4932;outline-offset:2px}.scores{display:grid;grid-template-columns:repeat(10,1fr);margin:0 10px 8px;border:1px solid #87938a;background:#fffef2}.frame{text-align:center;border-right:1px solid #b4bcae;min-width:0}.frame:last-child{border:0}.frame b{display:block;background:#d9e5dc;font-size:9px;padding:3px}.frame em{display:block;font:12px monospace;height:20px;padding-top:3px;font-style:normal;white-space:nowrap}.frame strong{display:block;font: bold 14px monospace;height:22px}.frame.active b{background:#b83830;color:white}.stage{margin:0 10px;position:relative;background:#183f52;border:2px inset #fff;overflow:hidden}canvas{display:block;width:100%;height:auto;touch-action:manipulation}.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#1033428a;padding:16px}.overlay.hidden{display:none}.card{max-width:370px;background:#fff9df;border:3px double #b53b32;padding:24px;text-align:center;box-shadow:6px 8px 0 #0003}.card h2{font-size:32px;color:#a22d29;margin:0 0 10px;line-height:1}.card p{line-height:1.5;margin:10px 0 18px}.card button{background:#ae372e;color:white;width:100%;border-color:#d8896d}.card small{display:block;font-size:10px;margin-top:12px;color:#63726a}.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px}.bar strong{font-size:13px}.bar small{display:block;font-size:10px;color:#5c706b;margin-top:3px}#roll{background:#a7342b;color:#fff;min-width:130px}#roll:disabled{background:#88988e;color:#eee;cursor:default}.status{padding:7px 10px;border-top:2px groove white;display:flex;justify-content:space-between;font:10px monospace;gap:8px}.footer{text-align:center;font-size:9px;padding:6px 12px;color:#5b716b}@media(max-width:430px){body{padding:5px}header{padding:10px}h1{font-size:21px}.stage{margin:0 6px}.scores{margin:0 6px 6px}.card{padding:16px}.card h2{font-size:26px}.card p{font-size:12px;margin-bottom:12px}.frame em{font-size:10px}.frame strong{font-size:12px}.bar{padding:8px}.bar strong{font-size:11px}#roll{min-width:112px}.footer{font-size:8px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 .stage{background:#132744}.card{background:#fff7dfed}.title{background:linear-gradient(90deg,#13274b,#395d70);letter-spacing:.4px}.scores{box-shadow:0 0 0 2px #a6885b inset}.bar>div{min-width:0}.card small{line-height:1.4}@media(max-width:340px){.card{padding:9px}.card h2{font-size:20px}.tag{font-size:8px}.card p{margin:5px 0 7px}.card small{margin-top:6px}}@media(max-height:650px) and (min-width:620px){.window{width:515px}} /* Cold night outside; warm brass and garnet inside the clubhouse. */
 :root{color-scheme:dark;--ink:#f7e8cf;--muted:#aebeb5;--edge:#c6a76a48;--dark:#10201f;--red:#ad3b3f;--gold:#f5cf8c}
@@ -22,8 +22,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .card{color:var(--ink);border:1px solid #f4cf8b7a;border-radius:17px;padding:23px;background:linear-gradient(155deg,#192b25f5,#203331ef 65%,#261d24f0);box-shadow:0 14px 42px #0006,0 1px 0 #f4cf8b4c inset}
 .card h2{color:#f6dfae;font:700 clamp(24px,5.8vw,36px)/.94 Georgia,serif;letter-spacing:-.04em}
 .card p{color:#f3ebd8}.card small{color:#c4cbb9}.card p b{color:#ffd991}
-.card button,#roll{background:linear-gradient(#b74649,#892936);border:1px solid #e9a77889;color:#fff5e8;box-shadow:0 2px 0 #4d1826,0 1px 0 #ffecb529 inset}
-#roll:disabled{background:#263833;border-color:#95886555;box-shadow:none;color:#b0b6a8}
+.card button{background:linear-gradient(#b74649,#892936);border:1px solid #e9a77889;color:#fff5e8;box-shadow:0 2px 0 #4d1826,0 1px 0 #ffecb529 inset}
 .bar{padding:10px 13px;color:#f1e5c8}.bar small{color:#a8b8ad}.bar strong{letter-spacing:.045em}
 .status{border-top:1px solid #c6a76a38;background:#071a175e;color:#e0be82;padding:7px 13px}.footer{color:#a3b4ac}
 @media(max-width:430px){body{padding:5px}.window{border-radius:14px}.title{padding:7px 10px}.stage{margin:0 6px;border-radius:8px}.scores{margin:0 6px 6px}.bar{padding:8px}.card{padding:15px}.card p{font-size:12px}.card h2{font-size:26px}}
@@ -37,35 +36,22 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
 .bar{padding-bottom:8px}.audio-credits{margin-top:3px}.audio-credits summary{cursor:pointer}.footer a{color:#dadab0}
 @media(max-width:430px){.bar{padding-bottom:8px}}
-.taunt-setup{border:1px solid #79684c;border-radius:7px;margin:6px 10px 3px;background:#192a33;color:#f8e6bb;font:650 13px/1.35 system-ui,sans-serif}
-.taunt-setup summary{position:relative;cursor:pointer;padding:11px 10px;min-height:44px;box-sizing:border-box}
-.taunt-setup summary span{float:right;color:#d2dcc1;font-size:11px;font-weight:700}
-.taunt-content{border-top:1px solid #665c47;padding:6px 10px 11px;color:#e4e6d2}
-.taunt-content p{margin:5px 0 8px}.taunt-content a{color:#ffdc9d;text-underline-offset:2px}
-.taunt-actions{display:flex;flex-wrap:wrap;gap:5px}
-.taunt-actions button{box-sizing:border-box;min-height:44px;padding:5px 10px;font-size:12px;letter-spacing:.01em}
-.taunt-actions button:disabled{opacity:.52}.taunt-content .taunt-note{font-size:11px;color:#bdcbbb;margin-bottom:0}
-@media screen and (max-width:375px){.taunt-setup{font-size:12px}.taunt-actions button{padding-inline:8px}}
-</style></head><body><main class="window"><div class="title"><span>❄ NORTH POLE STRIKE 3D.exe</span><span>★</span></div><header><h1>NORTH POLE STRIKE<small>3D NIGHT-SHIFT BOWLING</small></h1><button id="mute" aria-label="Enable sound">♪ OFF</button></header><section class="scores" id="scores" aria-label="Ten-frame bowling scorecard"></section><section class="stage"><canvas id="lane" width="640" height="570" tabindex="0" aria-label="Split view of the bowling lane and pin deck. Click or tap the lane, or press Space or Enter, to stop the sweeping arrows and bowl in one action."></canvas><div class="overlay" id="overlay"><div class="card"><h2>THE ELVES<br>ARE ON STRIKE.</h2><p>Santa has a different kind of strike in mind.<br><b>Stop the direction arrow. That’s your shot.</b><br>Ten frames. Ten cheeky elves. One big red ball.</p><button id="start">LET’S BOWL! ▶</button><small>Click or tap the lane, or press Space or Enter. One press aims and throws.</small></div></div></section><div class="bar"><div><strong id="message" aria-live="polite">THE NORTH POLE IS CLOSED FOR BOWLING.</strong><small id="hint">One press stops the arrow and throws.</small></div><button id="roll" aria-label="Stop the arrow and bowl" aria-keyshortcuts="Space Enter" disabled>BOWL! ▶</button></div><div class="status"><span id="turn">FRAME 1 / 10</span><span id="best">BEST 0</span></div><section class="taunt-setup" aria-label="Original Elf Bowling sounds">
- <details id="tauntSetup">
-  <summary>Original Elf Bowling sounds <span id="tauntState">Checking…</span></summary>
-  <div class="taunt-content">
-   <p id="tauntStatus" role="status">Checking this browser for saved audio…</p>
-   <p id="originalScreamStatus">Checking for the original scream…</p>
-   <p><a href="https://ftpmirror1.infania.net/pub/gamesdomain/shareware/elfbowl.zip" target="_blank" rel="noopener noreferrer">Get the original 1999 ZIP</a>, then choose it from Files. No need to run the game or unzip it.</p>
-   <input type="file" id="tauntFile" hidden multiple>
-   <div class="taunt-actions">
-    <button type="button" id="tauntLoad" disabled>Choose game file</button>
-    <button type="button" id="tauntPreview" disabled>Play a sound</button>
-    <button type="button" id="originalScreamPreview" aria-describedby="originalScreamStatus" disabled>Play original scream</button>
-    <button type="button" id="tauntRemove" disabled>Remove</button>
-   </div>
-   <p class="taunt-note">Built-in sounds are ready when you play. Saved original sounds load automatically in this browser. Original 1999 sounds by NVision Design may load automatically on this GitHub game from an unchanged copy at the Internet Archive. If it’s unavailable, choose your game file. Only the sounds are saved in your browser.</p>
-  </div>
- </details>
-</section>
-<div class="footer">An independent holiday bowling tribute.
-<details class="audio-credits"><summary>Audio credits</summary>Santa’s laugh by <a href="https://freesound.org/people/canucklovingbrit/sounds/110642/" target="_blank" rel="noopener">canucklovingbrit</a> (CC0). Original 1999 sounds by NStorm/NVision Design are only read from the game file you choose. They are not included in this site. The new taunt rotation uses newly generated dialogue with <a href="https://huggingface.co/ResembleAI/chatterbox-nano" target="_blank" rel="noopener">Resemble AI Chatterbox Nano</a>. It is not original game audio. If another sound effect is missing, this game uses its own effect. The approaching-ball scream has no substitute.</details></div></main><script>
+header{padding:8px 14px;min-height:54px}
+header h1{font-size:clamp(22px,5.5vw,32px);margin:0}
+#mute{min-width:44px;min-height:44px;font-size:18px;padding:3px 8px;letter-spacing:-.03em}
+#mute[aria-pressed="true"]{color:#b6b8af}
+.status{display:grid;grid-template-columns:1fr auto 1fr;gap:4px;align-items:center;white-space:nowrap;font-size:clamp(9px,2.7vw,12px);letter-spacing:.01em}
+.status #message{text-align:center;color:#f5e7c1}.status #best{text-align:right}
+.card{min-width:min(77%,244px);padding:15px}.card button{min-height:48px;font-size:16px;letter-spacing:normal}
+.card small{display:block;margin-top:7px;text-align:center}
+.audio-recovery{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:7px 12px}
+.audio-recovery button{min-height:44px}
+.audio-recovery-status{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+</style></head><body><main class="window"><header><h1>North Pole Strike</h1><button type="button" id="mute" aria-label="Mute sound" aria-pressed="false">♪</button></header><section class="scores" id="scores" aria-label="Ten-frame bowling scorecard"></section><section class="stage"><canvas id="lane" width="640" height="570" tabindex="0" role="button" aria-label="Bowling lane. Tap or press Space or Enter to bowl." aria-keyshortcuts="Space Enter" aria-disabled="true"></canvas><div class="overlay" id="overlay"><div class="card"><button type="button" id="start">Play</button><small>Tap the lane or press Space to bowl.</small></div></div></section><div class="status">
+<span id="turn">Frame 1 · Ball 1</span>
+<strong id="message" aria-live="polite"></strong>
+<span id="best">Best 0</span>
+</div></main><script>
 (() => {
 'use strict';
 // The picker reads data only. It never navigates to, uploads, or runs a file.
@@ -175,9 +161,15 @@ const defs=Object.freeze(SIGNATURES.clips);
 const archive=SIGNATURES.archive;
 const MAX_FILE=8*1024*1024,DB='north-pole-original-taunts-v1',LIMIT=24;
 const $=id=>document.getElementById(id);
-const picker=$('tauntFile'),load=$('tauntLoad'),listen=$('tauntPreview'),remove=$('tauntRemove');
-const status=$('tauntStatus'),short=$('tauntState');
-const screamListen=$('originalScreamPreview'),screamStatus=$('originalScreamStatus');
+// Manual recovery remains possible at ?sound=setup without a game-screen box.
+if(typeof location!=='undefined'&&new URLSearchParams(location.search).get('sound')==='setup'){
+ document.querySelector('main.window')?.insertAdjacentHTML('beforeend',
+  '<div class="audio-recovery"><input id="tauntFile" type="file" hidden multiple>'+
+  '<button type="button" id="tauntLoad" disabled>Add original sounds</button>'+
+  '<button type="button" id="tauntRemove" disabled>Remove original sounds</button>'+
+  '<span class="audio-recovery-status" id="tauntStatus" role="status"></span></div>');
+}
+const picker=$('tauntFile'),load=$('tauntLoad'),remove=$('tauntRemove'),status=$('tauntStatus');
 const clips=new Map();
 let busy=false,hasSaved=false,heard=-1;
 const ids=Object.keys(defs);
@@ -267,16 +259,10 @@ const bytes=value=>value instanceof Uint8Array?value:new Uint8Array(value);
 const u16=(view,n)=>view.getUint16(n,true),u32=(view,n)=>view.getUint32(n,true);
 const view=buf=>new DataView(buf.buffer,buf.byteOffset,buf.byteLength);
 const dirname=n=>n.replaceAll('\\','/').split('/').at(-1).toLowerCase();
-function tell(s){status.textContent=s;}
+function tell(s){if(status)status.textContent=s;}
 function refresh(){
- const n=clips.size;
- const old=n>0&&n<ids.length;
- short.textContent=busy?'Working…':n===ids.length?'Loaded':old?'Reload ZIP':'Not loaded';
- load.textContent=old?'Choose ZIP again':'Choose game file';
- const screamReady=clips.has('oldScream');
- screamStatus.textContent=busy?'Checking for the original scream…':screamReady?'Original scream loaded and verified.':'Original scream not loaded. Choose the 1999 ZIP. No substitute will play.';
- screamListen.disabled=busy||!screamReady;
- load.disabled=busy;listen.disabled=busy||!n;remove.disabled=busy||!n;
+ if(load)load.disabled=busy;
+ if(remove)remove.disabled=busy||!clips.size;
 }
 function changed(){
  heard=-1;window.northAudio?.clearOriginal?.();refresh();
@@ -449,8 +435,8 @@ busy=true;refresh();
   void tryAutoArchive();
  }
 })();
-load.addEventListener('click',()=>{if(!busy){if(autoReading||autoPending)cancelAuto();picker.click();}});
-picker.addEventListener('change',async()=>{
+load?.addEventListener('click',()=>{if(!busy){if(autoReading||autoPending)cancelAuto();picker.click();}});
+picker?.addEventListener('change',async()=>{
  const files=Array.from(picker.files||[]);
  picker.value='';
  if(!files.length||busy)return;
@@ -470,22 +456,7 @@ picker.addEventListener('change',async()=>{
  }catch(e){tell(e instanceof Error?e.message:'Could not read the selected files.');}
  finally{busy=false;refresh();}
 });
-listen.addEventListener('click',async()=>{
- const choices=ids.filter(id=>clips.has(id));
- if(!choices.length||busy)return;
- heard=(heard+1)%choices.length;
- const id=choices[heard];
- const played=await window.northAudio?.previewOriginal?.(id);
- if(busy||!clips.has(id))return;
- tell(played===true?'Playing original audio'+(defs[id].label?': '+defs[id].label:'.'):played==='muted'?'Turn Sound on, then tap Play a sound.':'Could not play the clip. Try again with Sound on.');
-});
-screamListen.addEventListener('click',async()=>{
- if(busy||!clips.has('oldScream'))return;
- const played=await window.northAudio?.previewOriginal?.('oldScream');
- if(busy||!clips.has('oldScream'))return;
- tell(played===true?'Playing the verified 1999 scream.':played==='muted'?'Turn Sound on, then tap Play original scream.':'Could not play the original scream. Try again with Sound on.');
-});
-remove.addEventListener('click',async()=>{
+remove?.addEventListener('click',async()=>{
  if(busy)return;
  cancelAuto();busy=true;refresh();
  try{
@@ -721,7 +692,7 @@ function frameDone(f,a){return f<9?(a[0]===10||a.length===2):(a.length>=2&&((a[0
 let frames=[[]],frame=0,state='intro',time=0,last=0,aim=0,best=0,muted=false,audio;
 try{best=+localStorage.getItem('north-pole-best')||0;muted=localStorage.getItem('north-pole-sound')==='0';}catch{}
 function sound(freq,dur=.1,type='sine'){if(muted||window.northAudio)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();audio.resume();let o=audio.createOscillator(),v=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(50,freq*.6),audio.currentTime+dur);v.gain.setValueAtTime(.07,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.connect(v).connect(audio.destination);o.start();o.stop(audio.currentTime+dur);}catch{}}
-function announce(msg,tip){$('message').textContent=msg;$('hint').textContent=tip||'Tap when the arrow lines up. Space works too.';}
+function announce(msg){$('message').textContent=msg;}
 // A spare completes a standing rack across two throws. A fill ball can
 // instead start a fresh rack; its 0 is a dash even immediately after X.
 function pinMark(n,j,a,f){
@@ -729,8 +700,8 @@ function pinMark(n,j,a,f){
  if(f===9&&j===2&&a[0]===10&&a[1]<10&&a[1]+n===10)return '/';
  return n===10?'X':n===0?'–':String(n);
 }
-function scoreUI(){const totals=bowlingScores(frames);$('scores').innerHTML=Array.from({length:10},(_,i)=>{let a=frames[i]||[],text=a.map((n,j)=>pinMark(n,j,a,i)).join(' ');return '<div class="frame '+(i===frame?'active':'')+'"><b>'+ (i+1)+'</b><em>'+text+'</em><strong>'+(totals[i]??'')+'</strong></div>';}).join('');$('turn').textContent=state==='over'?'GAME COMPLETE':'FRAME '+(frame+1)+' / 10 · BALL '+((frames[frame]?.length||0)+1);$('best').textContent='BEST '+best;$('roll').disabled=state!=='aim';$('mute').textContent=muted?'♪ OFF':'♪ ON';$('mute').setAttribute('aria-label',muted?'Enable sound':'Mute sound');}
-function end(){state='over';cueAudio('over');const total=bowlingScores(frames)[9],record=total>best;if(record){best=total;try{localStorage.setItem('north-pole-best',best)}catch{}}$('overlay').innerHTML='<div class="card"><h2>'+total+' POINTS<br>'+(record?'NEW RECORD!':'SHIFT’S OVER!')+'</h2><p>You finished all ten frames.</p><button id="again">BOWL AGAIN ↻</button><small>Best on this device: '+best+' · Space to replay</small></div>';$('overlay').classList.remove('hidden');$('again').onclick=start;announce('FINAL SCORE: '+total);scoreUI();sound(880,.3);}
+function scoreUI(){const totals=bowlingScores(frames);$('scores').innerHTML=Array.from({length:10},(_,i)=>{let a=frames[i]||[],text=a.map((n,j)=>pinMark(n,j,a,i)).join(' ');return '<div class="frame '+(i===frame?'active':'')+'"><b>'+ (i+1)+'</b><em>'+text+'</em><strong>'+(totals[i]??'')+'</strong></div>';}).join('');$('turn').textContent=state==='over'?'10 frames':'Frame '+(frame+1)+' · Ball '+((frames[frame]?.length||0)+1);$('best').textContent='Best '+best;$('mute').textContent=muted?'♪×':'♪';$('mute').setAttribute('aria-label',muted?'Enable sound':'Mute sound');$('mute').setAttribute('aria-pressed',String(muted));c.setAttribute('aria-disabled',String(state!=='aim'));}
+function end(){state='over';cueAudio('over');const total=bowlingScores(frames)[9],record=total>best;if(record){best=total;try{localStorage.setItem('north-pole-best',best)}catch{}}$('overlay').innerHTML='<div class="card"><h2>'+total+' points'+(record?'<small>New best</small>':'')+'</h2><button type="button" id="again">Play again</button></div>';$('overlay').classList.remove('hidden');$('again').onclick=start;announce('Complete');scoreUI();sound(880,.3);}
 
 const W=640,H=570,R=Math.PI,clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),mix=(a,b,t)=>a+(b-a)*t,ease=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
 let cam,faces=[],light;
@@ -1049,63 +1020,100 @@ const air=t?Math.min(.57,Math.max(0,rd.y-.04)*.76)*(1-ease((rd.age-.67)/.44)):ho
 support.draw(air,Boolean(t),lean,roll);
 
 }
+// Continuous sectional solids for Santa. The same silhouette drives both renderers.
+// Sections: height, half-width, half-depth, forward offset, superellipse exponent.
+const NORTH_SANTA_PROFILES={
+ coat:[[.445,.43,.29,.044,.81],[.474,.515,.346,.056,.77],[.54,.522,.36,.064,.79],[.69,.492,.348,.066,.85],[.79,.495,.339,.066,.86],[.92,.514,.328,.047,.88],[1.047,.535,.312,.034,.87],[1.17,.50,.27,.017,.87],[1.265,.38,.23,.014,.89],[1.315,.212,.173,.003,1],[1.323,.016,.018,0,1]],
+ hem:[[.442,.436,.298,.044,.81],[.451,.493,.33,.050,.80],[.480,.524,.353,.057,.77],[.524,.526,.363,.061,.79],[.539,.510,.349,.063,.79]],
+ belt:[[.693,.492,.351,.067,.83],[.708,.502,.359,.067,.85],[.771,.502,.355,.066,.85],[.785,.495,.348,.066,.87]],
+ boot:[[-.076,.156,.228,.091,.57],[-.060,.177,.249,.099,.56],[-.016,.175,.250,.101,.59],[.027,.166,.222,.095,.68],[.065,.151,.174,.056,.77],[.105,.145,.113,-.008,.81],[.176,.137,.112,-.019,.84],[.195,.128,.104,-.021,.88],[.198,.012,.013,-.021,1]],
+ sole:[[-.086,.151,.217,.091,.57],[-.079,.176,.246,.096,.56],[-.060,.179,.251,.100,.56],[-.044,.173,.245,.099,.58]],
+ thigh:[[-.08,.64,.66,0,.92],[.04,.96,.97,0,.89],[.28,1,.98,0,.88],[.69,.89,.89,.02,.96],[.97,.76,.80,0,.94],[1.07,.30,.30,0,1]],
+ sleeve:[[-.105,.57,.58,0,.94],[.04,.96,.91,0,.83],[.23,1,.98,0,.85],[.53,.92,.96,0,.87],[.84,.86,.91,.02,.87],[1.04,.76,.81,0,.9],[1.09,.23,.24,0,1]],
+ forearm:[[-.08,.38,.38,0,.96],[.06,.86,.89,0,.86],[.33,.98,.96,0,.86],[.76,.85,.88,.025,.91],[1,.78,.82,.027,.88],[1.045,.32,.32,.025,.92]],
+ cuff:[[.8,.9,.9,0,.88],[.83,1.075,1.045,0,.80],[.98,.99,1.00,.01,.79],[1.04,.87,.88,.01,.80]],
+ mitt:[[-.47,.19,.25,0,.89],[-.37,.65,.69,-.01,.80],[-.04,1,.87,0,.82],[.32,.99,.88,.05,.78],[.64,.81,.79,.10,.78],[.88,.49,.55,.13,.90],[.96,.08,.16,.13,1]],
+ head:[[-.29,.135,.145,.025,.95],[-.23,.218,.203,.035,.89],[-.11,.273,.239,.041,.81],[.04,.281,.251,.027,.90],[.18,.268,.244,.006,.93],[.27,.206,.194,-.007,.96],[.305,.026,.031,0,1]],
+ hair:[[-.235,.095,.040,-.127,1],[-.19,.202,.083,-.147,.82],[-.11,.251,.116,-.148,.87],[.016,.271,.124,-.145,.91],[.113,.265,.114,-.137,.97],[.202,.218,.102,-.112,.98],[.237,.120,.067,-.084,1]],
+ beard:[[-.535,.043,.046,.264,1],[-.49,.106,.076,.247,.94],[-.423,.181,.106,.215,.91],[-.332,.231,.126,.190,.88],[-.244,.252,.128,.166,.87],[-.145,.248,.102,.152,.91],[-.079,.204,.078,.157,.90],[-.055,.151,.046,.164,1],[-.049,.027,.014,.165,1]],
+};
+const northSantaVertex=(p,a)=>{const [y,x,z,off,e]=p,c=Math.cos(a),s=Math.sin(a);return [Math.sign(c)*Math.pow(Math.abs(c),e)*x,y,Math.sign(s)*Math.pow(Math.abs(s),e)*z+off];};
+function northSantaSegment(A,kind,a,b,w,d,c,m){
+ const delta=b.map((n,i)=>n-a[i]),Y=norm(...delta);
+ const X=Math.hypot(Y[0],Y[1])>.02?norm(Y[1],-Y[0],0):[1,0,0],Z=[X[1]*Y[2]-X[2]*Y[1],X[2]*Y[0]-X[0]*Y[2],X[0]*Y[1]-X[1]*Y[0]];
+ const T=q=>[a[0]+q[0]*X[0]+q[1]*delta[0]+q[2]*Z[0],a[1]+q[0]*X[1]+q[1]*delta[1]+q[2]*Z[1],a[2]+q[0]*X[2]+q[1]*delta[2]+q[2]*Z[2]];
+ A.loft(kind,T,w,1,d,c,m);
+}
 function northSantaCartoon(stride,A){
-const {S,limb,cap}=A;
-const T=pose(stride.x,stride.y,stride.z,stride.lean,stride.twist,-.045+stride.lean*.09),red='#d52438',white='#fff1d6',black='#2d1d2d',skin='#f9b38b';
+const {S,loft,cap,block}=A;
+const T=pose(stride.x,stride.y,stride.z,stride.lean,stride.twist,-.045+stride.lean*.09);
+const red='#c72b3d',shadowRed='#a52335',white='#fff1dc',black='#272430',skin='#f1b084',stitch='#e86566';
+const ready=state==='approach'?ease(phase/DELIVERY):0,releaseBounce=state==='roll'?Math.exp(-phase*8)*Math.sin(phase*16):0;
 for(const side of [-1,1]){
  const foot=side<0?stride.left:stride.right,
- h=T([side*.23,.50,0]),k=[mix(h[0],foot[0],.68),mix(h[1],foot[1],.55),mix(h[2],foot[2],.61)+.13];
- limb(id,h,k,.154,.149,red);limb(id,k,[foot[0],foot[1]+.055,foot[2]],.137,.140,red);
- const heel=side>0&&stride.left[2]>.84?.23:0, ft=pose(...foot,-heel);
- S(ft,0,0,.077,.208,.124,.283,black,4);S(ft,0,-.061,.082,.213,.035,.290,'#211b30',4);S(ft,0,.126,-.02,.168,.063,.162,white,2);
+ hip=T([side*.207,.524,0]),k=[mix(hip[0],foot[0],.65),mix(hip[1],foot[1],.58),mix(hip[2],foot[2],.61)+.101],
+ ankle=[foot[0],foot[1]+.120,foot[2]-.018];
+ northSantaSegment(A,'thigh',hip,k,.156,.149,shadowRed,0);
+ northSantaSegment(A,'thigh',k,ankle,.122,.128,shadowRed,0);
+ const heel=side>0&&stride.left[2]>.84?.23:0,ft=pose(...foot,-heel,side*.057);
+ loft('boot',ft,1,1,1,black,4);
+ loft('sole',ft,1,1,1,'#1d1b28',4);
+ S(ft,0,.165,-.02,.148,.045,.126,'#302c35',4);
 }
-S(T,0,.86,.040,.654,.567,.472,red);S(T,0,.66,.093,.646,.390,.457,red);S(T,0,.514,.042,.593,.107,.402,white,2);
-S(T,0,.730,.079,.663,.093,.471,black,4);
-S(T,0,.737,.532,.149,.111,.046,'#f1b95f',4);S(T,0,.737,.570,.091,.058,.023,black,4);
-S(T,0,1.02,.472,.082,.301,.075,white,2);
-for(const y of [.88,1.03,1.15])S(T,0,y,.541,.033,.035,.023,'#c58b41',4);
+// One substantial tailored coat, capped by fabric trim and a waist belt following
+// the same profile. Neither is a stacked body sphere.
+loft('coat',T,1,1,1,red,0);
+loft('hem',T,1,1,1,white,2);
+loft('belt',T,1,1,1,black,4);
+const buckle=pose(0,.739,.419,0,.035,0),B=q=>T(buckle(q));
 for(const side of [-1,1]){
- const a=T([side*.48,1.095,.01]),d=side>0?stride.hand:T([-.62,.70+stride.lean*.43,.285-stride.lean*.90]);
- const b=[mix(a[0],d[0],.51)+side*.13,mix(a[1],d[1],.50)-.075,mix(a[2],d[2],.52)-.06];
- limb(id,a,b,.191,.181,red);limb(id,b,d,.159,.151,red);
- S(id,mix(b[0],d[0],.84),mix(b[1],d[1],.84),mix(b[2],d[2],.84),.160,.080,.147,white,2);
- S(id,...d,.142,.119,.115,'#962447');S(id,d[0]-side*.08,d[1]+.013,d[2]+.059,.070,.069,.069,'#962447');
+ block(B,side*.094,0,0,.038,.138,.038,'#f0bc62',4);
+ block(B,0,side*.061,.006,.174,.025,.035,'#f0bc62',4);
+ for(let j=0;j<2;j++)S(T,side*(.33+j*.017),.864+j*.036,.267-j*.032,.009,.025,.009,stitch,0,false);
 }
-const ready=state==='approach'?ease(phase/DELIVERY):0,releaseBounce=state==='roll'?Math.exp(-phase*8)*Math.sin(phase*16):0;
-const F=pose(0,1.57+Math.sin(time*3)*.020+releaseBounce*.06,.062,-.07*Math.sin(time*2)-ready*.19+releaseBounce*.30,.071*Math.sin(time*1.4),.065+releaseBounce*.11),head=q=>T(F(q));
-const eyebrow='#fff0cc',bl=Math.sin(time*2.4)>.975?.23:1;
-S(head,0,0,0,.378,.354,.306,skin,1);
+block(B,.036,0,.024,.109,.014,.013,'#d09549',4);
+for(const [y,z] of [[.825,.398],[.911,.377],[.998,.355],[1.088,.325],[1.176,.284]])S(T,.033,y,z,.027,.027,.018,'#efb761',4,false);
 for(const side of [-1,1]){
- S(head,side*.311,-.027,.030,.087,.091,.076,skin,1);
- S(head,side*.201,-.054,.236,.113,.081,.079,'#ed826e',1);
- S(head,side*.118,.068,.245,.096,.070*bl+.012,.052,'#9c5045',1);
- S(head,side*.118,.068,.267,.087,.070*bl,.052,white,6,false);
- S(head,side*.115,.063,.303,.043,.051*bl,.029,'#63b4d9',1);
- S(head,side*.114,.061,.324,.025,.038*bl,.018,'#25213c',4);
- if(bl>.3)S(head,side*.115-.014,.083,.339,.013,.013,.009,'#fffdf6',6,false);
- const bt=pose(side*.120,.166,.239,0,0,side*.16);
- S(q=>head(bt(q)),0,0,0,.120,.037,.047,eyebrow,2);
- // Rounded beard curls wrap around the head instead of a flat chin patch.
- S(head,side*.245,-.170,.168,.135,.180,.167,'#f5e3c4',2);
- S(head,side*.171,-.286,.215,.136,.163,.154,white,2);
- S(head,side*.096,-.374,.232,.119,.139,.120,'#fff7e3',2);
+ const shoulder=T([side*.407,1.130,.008]),hand=side>0?stride.hand:T([-.62,.70+stride.lean*.43,.285-stride.lean*.90]);
+ const elbow=[mix(shoulder[0],hand[0],.51)+side*.12,mix(shoulder[1],hand[1],.50)-.075,mix(shoulder[2],hand[2],.52)-.065];
+ const wrist=elbow.map((n,i)=>mix(n,hand[i],.83));
+ northSantaSegment(A,'sleeve',shoulder,elbow,.183,.158,red,0);
+ northSantaSegment(A,'forearm',elbow,wrist,.148,.137,red,0);
+ northSantaSegment(A,'cuff',elbow,wrist,.146,.134,white,2);
+ const gloveCenter=hand.map((n,i)=>n+(hand[i]-wrist[i])*.52);
+ northSantaSegment(A,'mitt',hand,gloveCenter,.109,.086,'#8a223f',0);
+ const thumb=T([-.017,.011,.014]),o=T([0,0,0]);
+ S(id,hand[0]-side*.065+thumb[0]-o[0],hand[1]+.019,hand[2]+.053,.059,.054,.061,'#8a223f',0);
 }
-S(head,0,-.289,.220,.260,.188,.173,white,2);
-S(head,0,-.413,.219,.173,.177,.121,white,2);
-S(head,0,-.176,.355,.152,.065+Math.max(0,releaseBounce)*.041,.058,'#651f38',1);
-S(head,0,-.154,.398,.106,.023,.018,'#fff3d7',6,false);
-S(head,0,-.212,.391,.058,.017,.013,'#ed8a79',1);
+// Head and tapered beard are solids; comparatively small eyes and shallower
+// trim keep Santa expressive without replacing the face with bulbous pieces.
+const F=pose(0,1.575+Math.sin(time*3)*.014+releaseBounce*.048,.055,-.049*Math.sin(time*2)-ready*.17+releaseBounce*.25,.056*Math.sin(time*1.4),.049+releaseBounce*.10),head=q=>T(F(q));
+loft('head',head,1,1,1,skin,1);
+loft('hair',head,1,1,1,'#e7dac6',2);
+loft('beard',head,1,1,1,'#fff1de',2);
+const bl=Math.sin(time*2.4)>.975?.23:1;
 for(const side of [-1,1]){
- const wt=pose(side*.107,-.105,.338,0,side*.14,side*.29);
- S(q=>head(wt(q)),0,0,0,.143,.055,.073,'#fff7e3',2);
+ S(head,side*.267,-.038,.009,.059,.080,.058,skin,1);
+ S(head,side*.247,-.088,.058,.039,.116,.042,'#e4d2ba',2);
+ S(head,side*.183,-.069,.210,.070,.052,.047,'#d57e6c',1);
+ S(head,side*.093,.065,.238,.064,.043*bl,.035,'#f8e6d4',1);
+ S(head,side*.093,.062,.264,.026,.029*bl,.014,'#477290',1);
+ S(head,side*.095,.063,.274,.015,.021*bl,.012,'#2d2939',4);
+ if(bl>.3)S(head,side*.093-.007,.072,.280,.008,.008,.005,'#fffdf3',6,false);
+ const bt=pose(side*.106,.137,.216,0,0,side*.155);
+ S(q=>head(bt(q)),0,0,0,.084,.020,.035,'#f2e1cc',2);
+ S(head,side*.202,-.199,.154,.080,.117,.093,'#eee0ca',2);
+ const wt=pose(side*.092,-.119,.268,0,side*.195,side*.275);
+ S(q=>head(wt(q)),0,0,0,.118,.038,.068,'#fff6e9',2);
 }
-S(head,0,.003,.304,.111,.081,.118,'#ef9676',1);
-S(head,-.026,.026,.382,.049,.026,.034,'#ffb38b',1);
-const br=pose(-.006,.274,-.059,.11,0,.20);
-S(q=>head(br(q)),0,0,0,.384,.079,.342,white,2);
-const hat=pose(-.012,.296,-.059,.18+releaseBounce*.32,0,.49+.05*Math.sin(time*4)+releaseBounce*.27);
-cap(q=>head(hat(q)),0,0,0,.372,.577,.320,red,0,true);
-S(q=>head(hat(q)),.365,.488,0,.109,.104,.107,white,2);
+S(head,0,-.166,.291,.073,.027+Math.max(0,releaseBounce)*.010,.019,'#6c3549',1);
+S(head,0,.004,.270,.078,.058,.088,'#e68d73',1);
+S(head,-.019,.019,.333,.029,.019,.025,'#f5a184',1);
+const br=pose(-.006,.250,-.018,.10,0,.15);
+S(q=>head(br(q)),0,0,0,.302,.063,.274,white,2);
+const hat=pose(-.013,.278,-.025,.17+releaseBounce*.26,0,.51+.047*Math.sin(time*4)+releaseBounce*.245);
+cap(q=>head(hat(q)),0,0,0,.299,.535,.269,red,0,true);
+S(q=>head(hat(q)),.283,.454,0,.080,.081,.080,white,2);
 return T;
 }
 const NORTH_CAP_PROFILE=[[0,.94,0],[.105,1,0],[.27,.90,.02],[.49,.69,.13],[.68,.48,.27],[.81,.31,.45],[.88,.20,.67],[.884,.105,.84],[.845,.002,.98]];
@@ -1173,7 +1181,27 @@ function northCharacterFallback(){
   const weight=Math.round(39-24*Math.min(1,air/.4)).toString(16).padStart(2,'0');
   faces.push([p.reduce((d,q)=>d+q[2]/p.length,0),p,'#392b29'+weight,false,1]);
  };
- return {S,LOD:S,limb,cap,beard,curl,contact,block:box};
+ const loft=(kind,T,w,h,d,c,m=0)=>{
+  const pf=NORTH_SANTA_PROFILES[kind],center=pf.map(([y,rx,rz,z])=>project(T([0,y*h,z*d])));
+  if(center.some(q=>!q))return;
+  const first=center[0],last=center[center.length-1],mid=center[center.length>>1];
+  const ax=last[0]-first[0],ay=last[1]-first[1],len=Math.hypot(ax,ay)||1,nx=-ay/len,ny=ax/len;
+  const left=[],right=[],shine=[];
+  let near=0;
+  for(let i=0;i<pf.length;i++){
+   const [y,rx,rz,z,e]=pf[i],q=center[i],px=project(T([rx*w,y*h,z*d])),pz=project(T([0,y*h,(z+rz)*d]));
+   if(!px||!pz)return;
+   const dx=px[0]-q[0],dy=px[1]-q[1],zx=pz[0]-q[0],zy=pz[1]-q[1],a=nx*dx+ny*dy,b=nx*zx+ny*zy,R=Math.sqrt(a*a+b*b)||1;
+   const ux=(dx*a+zx*b)/R,uy=(dy*a+zy*b)/R,k=1+(1-e)*.15;
+   left.push([q[0]-ux*k,q[1]-uy*k]);right.push([q[0]+ux*k,q[1]+uy*k]);shine.push([q[0]+ux*.23,q[1]+uy*.23]);
+   near+=Math.hypot(px[2]-q[2],pz[2]-q[2])*.66;
+  }
+  const bias=kind==='belt'||kind==='hem'||kind==='cuff'||kind==='sole'?.03:0,
+   dep=mid[2]-near/pf.length-bias,colors=northFallbackColor(c,m);
+  faces.push([dep,left.concat(right.reverse()),colors[0]]);
+  if(kind==='coat'||kind==='boot'||kind==='sleeve'||kind==='head')faces.push([dep-.0004,shine.concat(right.slice()),shade(c,.86)]);
+ };
+ return {S,LOD:S,limb,cap,beard,curl,contact,block:box,loft};
 }
 function elf(p){northElfCartoon(p,cam.split===SPLIT,northCharacterFallback());}
 function santa(x,z,walk,swing){
@@ -1248,8 +1276,7 @@ function aimHud(){
   for(let i=0;i<LAMPS;i++)drawDirectionMarker(positions[i],cy,i===middle?midPhase:lampPhase(i,sweepSlot),rowScaleX,.92,i);
   drawDirectionMarker(centerX,cy-16,midPhase,rowScaleX*1.12,1.03,middle);
  }
- g.fillStyle='#14253be8';g.fillRect(20,535,314,27);g.strokeStyle='#e0bd7f';g.lineWidth=1;g.strokeRect(20,535,314,27);g.fillStyle='#f9dfa7';g.textAlign='center';
- g.font='900 14px Trebuchet MS';g.fillText(state==='aim'?'STOP THE ARROW · TAP OR SPACE':'DIRECTION LOCKED',177,553);g.restore();
+ g.restore();
 }
 function foldRagdoll(p){
  if(!p.down)return {x:p.x,z:p.z,y:p.y,rx:0,ry:0,rz:0,style:p.id%4,age:0,energy:0,legs:0,arms:0,catching:0};
@@ -1338,7 +1365,7 @@ function animationEvents(){
 function cueAudio(name,data={}){try{window.northAudio?.cue(name,data)}catch{}}
 
 function rack(){pins=[];for(let i=0;i<4;i++)for(let j=0;j<=i;j++){let x=(j-i/2)*.75,z=DECK+i*.70;pins.push({id:pins.length,x,z,y:0,vx:0,vz:0,vy:0,rx:0,ry:0,rz:0,wx:0,wz:0,down:false,moving:false})}}
-function resetTurn(){phase=0;B=null;incomingScare=null;state='aim';resetSweep();scoreUI();announce('WATCH THE DIRECTION ARROWS.','Tap the lane or press Space / Enter to bowl.');nextHeckle=Math.max(nextHeckle,time+2.45)}
+function resetTurn(){phase=0;B=null;incomingScare=null;state='aim';resetSweep();scoreUI();announce('Ready');nextHeckle=Math.max(nextHeckle,time+2.45)}
 let openingPending=false;
 function start(){
  if(openingPending)return;
@@ -1347,12 +1374,12 @@ function start(){
  const registry=window.northOriginal;
  if(!registry?.whenReady||registry.isReady())return beginGame();
  openingPending=true;
- const play=$('start'),prior=play?.textContent;
- if(play){play.disabled=true;play.textContent='LOADING SOUNDS…';}
+ const play=$('start');
+ if(play)play.disabled=true;
  try{window.northAudio?.primeBuiltIn?.();}catch{}
  const finish=()=>{
   openingPending=false;
-  if(play){play.disabled=false;play.textContent=prior;}
+  if(play)play.disabled=false;
   beginGame();
  };
  registry.whenReady().then(finish,finish);
@@ -1366,8 +1393,8 @@ function beginGame(){
  try{window.northAudio?.primeBuiltIn?.();}catch{}
  sound(550,.14);
 }
-function bowl(){if(state!=='aim'||last-sweepStarted<SLOT_MS)return;window.northOriginal?.boundary?.();locked=aim;state='approach';phase=0;knocked=0;nearHits=0;rollLen=0;shot++;scoreUI();announce('AIM LOCKED.','Watch Santa lift, plant and release.');cueAudio('lock');sound(180,.2,'triangle')}
-function launch(){state='roll';phase=0;B=launchBall(locked);announce('BALL AWAY!','Watch the deck.');cueAudio('release',{aim:locked});sound(180,.27,'triangle')}
+function bowl(){if(state!=='aim'||last-sweepStarted<SLOT_MS)return;window.northOriginal?.boundary?.();locked=aim;state='approach';phase=0;knocked=0;nearHits=0;rollLen=0;shot++;scoreUI();announce('Bowling');cueAudio('lock');sound(180,.2,'triangle')}
+function launch(){state='roll';phase=0;B=launchBall(locked);cueAudio('release',{aim:locked});sound(180,.27,'triangle')}
 function push(p,vx,vz){let j=Math.hypot(vx,vz);if(j<.22)return;p.vx+=vx;p.vz+=vz;if(!p.down&&Math.hypot(p.vx,p.vz)>.61){p.down=true;p.moving=true;p.vy=.95+j*.22;p.wx=-p.vz*1.45;p.wz=p.vx*2.3;knocked++;if(forecasting)return;p.fellAt=time;p.impactX=p.x;p.impactZ=p.z;p.hitX=vx;p.hitZ=vz;cueAudio('pin',{index:p.id,force:j,count:knocked});if(nearHits++<5)sound(165+p.id*23,.08,'triangle');for(let i=0;i<6;i++)particles.push({x:p.x,y:.55,z:p.z,vx:(Math.random()-.5)*3,vz:(Math.random()-.5)*3,vy:1+Math.random()*2,l:1+Math.random()*.4})}}
 let incomingScare=null;
 const SCARE_LEAD=.515, CONTACT_R=.61, ROLL_DRAG=Math.pow(.999,STEP*60),ROLL_DRAG_LOG=Math.log(ROLL_DRAG);
@@ -1439,9 +1466,9 @@ function recordRoll(){playLaneExit();const a=frames[frame];a.push(knocked);const
  const authenticCheer=category==='clean'&&window.northOriginal?.has('oldSanta');
  const bucket=category==='clean'&&!firstStrike&&!authenticCheer?'cleanVoice':category;
  showHeckle(drawBanter(bucket,knocked>=7),alive,-1,true);
- announce(spare?'SPARE!':knocked===10?'STRIKE!':knocked?knocked+' ELVES DOWN.':B?.gutter?'GUTTER BALL.':'NO CONTACT.',knocked===10?'Rack cleared.':knocked?'Watch for the sweep.':'Read the deck and line up again.');
+ announce(spare?'Spare!':knocked===10?'Strike!':knocked?knocked+' down':B?.gutter?'Gutter':'No contact');
  state='result';nextAt=time+(knocked===0?1.13:1.02);phase=0;scoreUI();cueAudio('result',{pins:knocked,hit:knocked,strike:knocked===10&&!spare,spare,santa:firstStrike,cleared:alive.length===0});if(spare||knocked===10){sound(520,.18);sound(780,.3)}}
-function nextRoll(){window.northOriginal?.boundary?.();let a=frames[frame],fresh=false;if(frameDone(frame,a)){if(frame===9){end();return;}frame++;frames.push([]);rack();fresh=true;}else if(frame===9&&(a[a.length-1]===10||a.length===2&&a[0]+a[1]===10)){rack();fresh=true;}else pins=pins.filter(p=>!p.down);cueAudio('rack',{fresh});resetTurn();announce(pins.length===10?'FRESH RACK.':pins.length+' LEFT STANDING.','Catch the light to bowl again.');}
+function nextRoll(){window.northOriginal?.boundary?.();let a=frames[frame],fresh=false;if(frameDone(frame,a)){if(frame===9){end();return;}frame++;frames.push([]);rack();fresh=true;}else if(frame===9&&(a[a.length-1]===10||a.length===2&&a[0]+a[1]===10)){rack();fresh=true;}else pins=pins.filter(p=>!p.down);cueAudio('rack',{fresh});resetTurn();}
 
 // Perspective, camera choreography and animated 3D set.
 let skyF=0;
@@ -1480,9 +1507,6 @@ function decor(){
 function panelUI(){
  if(state==='intro')return;
  g.fillStyle='#132a3c';g.fillRect(SPLIT-2,0,4,H);g.fillStyle='#e1bc78';g.fillRect(SPLIT-1,0,1,H);
- for(const [x,txt] of [[12,'01   •   APPROACH'],[SPLIT+12,'02   •   PIN DECK']]){
-  g.fillStyle='#15263df3';g.fillRect(x,10,159,27);g.textAlign='left';g.font='900 14px Trebuchet MS';g.fillStyle='#ffe5ad';g.fillText(txt,x+8,28);
- }
  if(state==='aim'||state==='approach')aimHud();
 
 }
@@ -1597,7 +1621,25 @@ const northCharacterGL=(()=>{
   const a=toe(i,j),b=toe(i+1,j),c=toe(i+1,j+1),d=toe(i,j+1);tube.push(...a,...b,...c,...a,...c,...d);
  }
  mesh('northElfToe',tube);
+ // Interpolated surface normals across the loft keep full silhouettes smooth
+ // while preserving the shaped squared angles of hems, soles and hand seams.
+ for(const [k,pf] of Object.entries(NORTH_SANTA_PROFILES)){
+  const N=16,rows=pf.map(r=>Array.from({length:N},(_,j)=>northSantaVertex(r,j*2*R/N))),v=[];
+  function P(i,j){
+   j=(j+N)%N;const p=rows[i][j],l=rows[Math.max(0,i-1)][j],h=rows[Math.min(rows.length-1,i+1)][j],a=rows[i][(j+N-1)%N],b=rows[i][(j+1)%N];
+   const u=h.map((x,k)=>x-l[k]),t=b.map((x,k)=>x-a[k]),n=norm(u[1]*t[2]-u[2]*t[1],u[2]*t[0]-u[0]*t[2],u[0]*t[1]-u[1]*t[0]);return [...p,...n];
+  }
+  for(let i=0;i<rows.length-1;i++)for(let j=0;j<N;j++){
+   const a=P(i,j),b=P(i+1,j),c=P(i+1,j+1),d=P(i,j+1);v.push(...a,...b,...c,...a,...c,...d);
+  }
+  // Closure triangles for the top and bottom of sculpted shapes.
+  for(const [i,sign] of [[0,-1],[rows.length-1,1]])for(let j=0;j<N;j++){
+   const a=rows[i][j],b=rows[i][(j+1)%N],z=pf[i][3];v.push(0,pf[i][0],z,0,sign,0,...a,0,sign,0,...b,0,sign,0);
+  }
+  mesh('northSanta_'+k,v);
+ }
  return {S,LOD,limb,block:(...a)=>block(...a),cap:(...a)=>add('northFloppyCap',...a),
+  loft:(kind,T,w,h,d,c,m)=>add('northSanta_'+kind,T,0,0,0,w,h,d,c,m,true),
   beard:(T,x,y,z,w,h,d,c,sh)=>add('northElfBeard',T,x,y,z,w,h,d,c,2,sh),
   curl:(T,x,y,z,side,c,sh)=>add('northElfToe',T,x,y,z,side,1,1,c,4,sh)
  };
@@ -1721,12 +1763,14 @@ window.northPackAtRest=()=>state==='intro'||state==='over';
 function tick(t){let dt=Math.min((t-last)/1000||.016,.04);last=t;if(!document.hidden){time+=dt;if(state==='aim')scanSweep(t);acc+=dt;while(acc>=STEP){sim(STEP);acc-=STEP}if(state==='result'){phase+=dt;if(time>=nextAt)nextRoll()}particles=particles.filter(p=>(p.l-=dt)>0);particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;p.vy-=3.6*dt;});animationEvents();}
  draw();requestAnimationFrame(tick);}
 
-$('start').onclick=start;$('roll').onclick=bowl;$('mute').onclick=()=>{muted=!muted;try{localStorage.setItem('north-pole-sound',muted?'0':'1')}catch{}scoreUI();try{window.northAudio?.mute(muted)}catch{}if(!muted){if(window.northPackAtRest())window.northOriginal?.boundary?.();void window.northOriginal?.tryAuto?.();}sound(660);};c.addEventListener('pointerdown',e=>{if((e.button!==0&&!(e.pointerType==='mouse'&&[1,2].includes(e.button)))||state!=='aim')return;e.preventDefault();bowl();});
+$('start').onclick=start;$('mute').onclick=()=>{muted=!muted;try{localStorage.setItem('north-pole-sound',muted?'0':'1')}catch{}scoreUI();try{window.northAudio?.mute(muted)}catch{}if(!muted){if(window.northPackAtRest())window.northOriginal?.boundary?.();void window.northOriginal?.tryAuto?.();}sound(660);};c.addEventListener('pointerdown',e=>{if((e.button!==0&&!(e.pointerType==='mouse'&&[1,2].includes(e.button)))||state!=='aim')return;e.preventDefault();bowl();});
+// Assistive activation may dispatch click without a preceding pointer event.
+c.addEventListener('click',e=>{if(state==='aim'&&(!e.pointerType||e.detail===0))bowl();});
 c.addEventListener('contextmenu',e=>e.preventDefault());
 c.addEventListener('auxclick',e=>e.preventDefault());
 window.addEventListener('keydown',e=>{
- if(!['Space','Enter','NumpadEnter'].includes(e.code)||e.repeat||(e.target.tagName==='BUTTON'&&e.target.id!=='roll')||['A','SUMMARY','INPUT'].includes(e.target.tagName))return;
- if(e.shiftKey&&e.code!=='Space'){if(e.target.id==='roll')e.preventDefault();return;}
+ if(!['Space','Enter','NumpadEnter'].includes(e.code)||e.repeat||e.target.tagName==='BUTTON'||['A','SUMMARY','INPUT'].includes(e.target.tagName))return;
+ if(e.shiftKey&&e.code!=='Space')return;
  if(state==='over'){e.preventDefault();start();return;}
  if(state==='intro'){if(e.code!=='Space'){e.preventDefault();start();}return;}
  e.preventDefault();bowl();
