@@ -488,7 +488,15 @@ function release(t){
  n.connect(low).connect(g).connect(master);n.start(t+.02);n.stop(t+1.88);roller=n;rollGain=g;n.onended=()=>{if(roller===n){roller=null;rollGain=null;}};
 }
 function pin(t,num){
- if(window.northOriginal?.has('oldPinSettle'))return;
+ // A first physical knockdown now drives both the rig and the original crash.
+ // No second crash at lane exit or on later elves in the same chain.
+ if(ctx.state==='running'&&oldBuffer('oldPinSettle')){
+  if(num!==1)return;
+  stopRoll();
+  if(liveScream)stopVoice();
+  originalEffect('oldPinSettle',t);
+  return;
+ }
  stopRoll();if(t-pinSince<.075)return;pinSince=t;
  for(let i=0;i<Math.max(1,Math.min(6,num));i++){const n=t+i*.022+Math.random()*.016;
   grit(n,1250+Math.random()*850,1.5,.075,.30); tone(n,320+Math.random()*220,180,.076,.10,'triangle');
@@ -560,11 +568,9 @@ function cue(name,d={}){
   else if(name==='pin'){pin(t,Number(d.count)||1);}
   else if(name==='leave'){
    if(originalRoll)stopRoll();
-   const sound=d.hit?'oldPinSettle':'oldGutterClunk';
-   // The 1999 mixer did not layer the live scream over the exit crash.
-   // Keep a deliberate preview (and a scream-only partial import) intact.
-   if(liveScream&&ctx.state==='running'&&oldBuffer(sound))stopVoice();
-   originalEffect(sound,t);
+   // An empty roll has its original clunk at lane exit. Contacting shots
+   // played their original pins at the moment a pin first went down.
+   if(!d.hit)originalEffect('oldGutterClunk',t);
   }
   else if(name==='rack'){originalEffect(d.fresh?'oldFullRack':'oldResetRack',t);}
   else if(name==='taunt'){if(clips[d.recording]||window.northOriginal?.has(d.recording))say(d.recording,Boolean(d.priority));}
@@ -669,8 +675,64 @@ function world(){
  for(const x of [-2.9,2.9]){box(id,x,2.24,37.45,1.0,1.14,.10,'#f7c77b');box(id,x,2.24,37.37,.07,1.14,.08,'#683d45');box(id,x,2.24,37.36,1,.07,.08,'#683d45')}
  for(const x of [-4.2,4.2])for(let z=34;z<40;z+=1.5){box(id,x,.22,z,.59,.44,.69,'#a53d45');box(id,x,.45,z,.62,.09,.72,'#ca6261');box(id,x,.49,z,.12,.025,.72,'#f6bf62')}
 }
+// Pose the collision-independent puppet, measure its true supporting shapes,
+// then translate the whole rig so its real sole/body meets the wood plane.
+const NORTH_ELF_FLOOR=.027;
+const NORTH_ELF_BEARD_PROFILE=[[0,.006],[.08,.22],[.25,.43],[.46,.70],[.69,.91],[.81,1],[.91,.89],[1,.63],[1.02,.007]];
+function northElfSupport(A,lod){
+ let lowest=Infinity,contactX=0,contactZ=0,lift=0;
+ const jobs=[];
+ function basis(T,x,y,z,w,h,d){
+  const o=T([x,y,z]),a=T([x+w,y,z]),b=T([x,y+h,z]),c=T([x,y,z+d]);
+  return [o[0],o[1],o[2],a[0]-o[0],a[1]-o[1],a[2]-o[2],b[0]-o[0],b[1]-o[1],b[2]-o[2],c[0]-o[0],c[1]-o[1],c[2]-o[2]];
+ }
+ function point(v,x,y,z){
+  const Y=v[1]+v[4]*x+v[7]*y+v[10]*z;
+  if(Y>=lowest)return;
+  lowest=Y;contactX=v[0]+v[3]*x+v[6]*y+v[9]*z;contactZ=v[2]+v[5]*x+v[8]*y+v[11]*z;
+ }
+ function save(kind,T,args){jobs.push([A[kind],q=>{const p=T(q);p[1]+=lift;return p;},args]);}
+ function ell(kind,T,x,y,z,w,h,d,...args){
+  const v=basis(T,x,y,z,w,h,d),r=Math.sqrt(v[4]*v[4]+v[7]*v[7]+v[10]*v[10])||1;
+  point(v,-v[4]/r,-v[7]/r,-v[10]/r);save(kind,T,[x,y,z,w,h,d,...args]);
+ }
+ function lathe(kind,profile,T,x,y,z,w,h,d,...args){
+  const v=basis(T,x,y,z,w,h,d),r=Math.sqrt(v[4]*v[4]+v[10]*v[10])||1;
+  for(const [y,q,offset=0] of profile)point(v,offset-v[4]*q/r,y,-v[10]*q/r);
+  save(kind,T,[x,y,z,w,h,d,...args]);
+ }
+ return {
+  S:(...args)=>ell('S',...args),LOD:(...args)=>ell('LOD',...args),
+  limb(T,a,b,r,depth,c,m=0,sh=true){
+   const angle=Math.atan2(b[0]-a[0],b[1]-a[1]),len=Math.hypot(b[0]-a[0],b[1]-a[1],b[2]-a[2]),
+   L=pose((a[0]+b[0])*.5,(a[1]+b[1])*.5,(a[2]+b[2])*.5,Math.atan2(b[2]-a[2],Math.hypot(b[0]-a[0],b[1]-a[1])),0,-angle);
+   ell(sh?'S':'LOD',q=>T(L(q)),0,0,0,r,len*.5+r*.30,depth,c,m,sh);
+  },
+  block(T,x,y,z,w,h,d,...args){
+   const v=basis(T,x,y,z,w,h,d);point(v,-Math.sign(v[4])*.5,-Math.sign(v[7])*.5,-Math.sign(v[10])*.5);
+   save('block',T,[x,y,z,w,h,d,...args]);
+  },
+  cap:(...args)=>lathe('cap',NORTH_CAP_PROFILE,...args),
+  beard:(...args)=>lathe('beard',NORTH_ELF_BEARD_PROFILE,...args),
+  curl(T,x,y,z,side,c,sh){
+   const v=basis(T,x,y,z,side,1,1),knots=NORTH_ELF_CURL,n=knots.length;
+   for(let i=0;i<n;i++){
+    const [x,y,r]=knots[i],a=knots[Math.max(0,i-1)],b=knots[Math.min(n-1,i+1)],nx=a[1]-b[1],ny=b[0]-a[0],len=Math.sqrt(nx*nx+ny*ny)||1;
+    const k0=(v[4]*nx+v[7]*ny)*r/len,k1=v[10]*r*.8,k=Math.sqrt(k0*k0+k1*k1)||1;
+    point(v,x-nx*r*k0/(len*k),y-ny*r*k0/(len*k),-r*.8*k1/k);
+   }
+   save('curl',T,[x,y,z,side,c,sh]);
+  },
+  draw(air,down,rx,rz){
+   if(!Number.isFinite(lowest))return;
+   lift=NORTH_ELF_FLOOR+air-lowest;
+   if(A.contact&&!lod)A.contact(contactX,contactZ,air,down,rx,rz);
+   for(const [emit,T,args] of jobs)emit(T,...args);
+  }
+ };
+}
 function northElfCartoon(p,lod,A){
-const {S,LOD,limb,block,cap,beard,curl}=A;
+const support=northElfSupport(A,lod),{S,LOD,limb,block,cap,beard,curl}=support;
 const t=p.down?1:0,blink=(Math.sin(time*3.6+p.id*2.4)>.976&&!t)?.16:1;
 const act=actorBeat(p),f=act.flail,st=act.style,h=act.reach,u=act.local;
 const rd=foldRagdoll(p),character=p.id%5,sideBias=p.id%2?1:-1,rootTurn=sideBias*(character===3?.40:.17);
@@ -685,10 +747,12 @@ const sway=(h?.20:.082)*Math.sin(u)+(h&&st===3?.40*Math.sin(u):0);
 const dip=t?0:.029*Math.sin(u)+Math.max(0,act.y)-crouch+(character===2?.14:character===0?.11:.04)*Math.sin(setback*Math.PI);
 const leanX=setback*[.44,.48,.33,.58,.33][character]-(character===1?.32:0)*lookFirst;
 const leanZ=setback*sideBias*[.11,.27,.34,.28,.19][character]+(h?.18:.046)*Math.sin(u);
-const T=pose(rd.x+setback*sideBias*(character===2?.14:.06),.024+rd.y+dip+impact*(character===2?.23:.11),rd.z+setback*(character===1?.20:.085),rd.rx+leanX+impact*-.47,rd.ry+sway+rootTurn*setback+follow*.24,rd.rz+leanZ+impact*sideBias*.40),s=lod?LOD:S;
+const lean=rd.rx+leanX+impact*-.47,roll=rd.rz+leanZ+impact*sideBias*.40;
+// Idle breathing/crouching moves joints, not the whole actor off its soles.
+const T=pose(rd.x+setback*sideBias*(character===2?.14:.06),0,rd.z+setback*(character===1?.20:.085),lean,rd.ry+sway+rootTurn*setback+follow*.24,roll),s=lod?LOD:S;
 const bodyW=[1.08,1.16,.95,1.03,1.10][character]*(1-strain*.31),
  bodyH=[1, .95,1.10,.98,1.03][character]*(1+strain);
-const shape=(x,y,z)=>[x*bodyW,y*bodyH,z*(1-strain*.145)];
+const shape=(x,y,z)=>[x*bodyW,y*(bodyH+dip*.32),z*(1-strain*.145)];
 const ht=pose(0,.82,0,-lookFirst*.22+setback*(character===1?.35:-.29)-follow*.23,(h?act.head:0)+(h&&st===1?.32:0)+sideBias*lookFirst*.31,-leanZ*.50+follow*.20);
 const facesX=[1.06,1.13,.99,.93,1.14][character],facesY=[1.04,.96,1.15,1.08,.99][character];
 const head=P=>{const q=ht([P[0]*facesX,(P[1]-.81)*facesY,P[2]]);return T(shape(...q));};
@@ -782,6 +846,9 @@ const flapHat=q=>head(hat([-q[0],q[1],q[2]]));
 cap(flapHat,0,.031,0,wide,tall,.191,red,0,true);
 s(flapHat,wide*.98,tall*.845+.027,0,.059,.061,.060,metal,4);
 if(!lod)s(flapHat,wide*.98,tall*.845+.019,-.053,.030,.011,.010,'#7d501e',4,false);
+const hop=!t&&h&&st===2?Math.max(0,act.y)*.64:0;
+const air=t?Math.min(.57,Math.max(0,rd.y-.04)*.76)*(1-ease((rd.age-.67)/.44)):hop;
+support.draw(air,Boolean(t),lean,roll);
 
 }
 function northSantaCartoon(stride,A){
@@ -898,7 +965,17 @@ function northCharacterFallback(){
   const p=out.concat(back.reverse());if(p.some(q=>!q))return;
   faces.push([p.reduce((sum,q)=>sum+q[2],0)/p.length,p,northFallbackColor(c,0)[0]]);
  };
- return {S,LOD:S,limb,cap,beard,curl,block:box};
+ const contact=(x,z,air,down,rx,rz)=>{
+  const a=down?.30:.13,b=down?.21:.10,p=[];
+  for(let i=0;i<8;i++){
+   const r=i*R*.25;
+   p.push(project([x+Math.cos(r)*a,.033,z+Math.sin(r)*b]));
+  }
+  if(p.some(q=>!q))return;
+  const weight=Math.round(39-24*Math.min(1,air/.4)).toString(16).padStart(2,'0');
+  faces.push([p.reduce((d,q)=>d+q[2]/p.length,0)-.11,p,'#392b29'+weight]);
+ };
+ return {S,LOD:S,limb,cap,beard,curl,contact,block:box};
 }
 function elf(p){northElfCartoon(p,cam.split===SPLIT,northCharacterFallback());}
 function santa(x,z,walk,swing){
@@ -928,10 +1005,10 @@ function slotAt(ms){
 function resetSweep(){sweepStarted=last;sweepSlot=0;aim=-1;}
 function scanSweep(t){sweepSlot=slotAt(t-sweepStarted);aim=(sweepSlot-(LAMPS-1))/(LAMPS-1);}
 function lampPhase(lamp,slot){const d=Math.abs(lamp*2-slot);return d===0?2:d===1?1:0;}
-// Original-style lane markers: fifteen sweep positions and a separate fixed center cue.
-// The center cue is not a timing position. Half-steps remain orange adjacent pairs.
-function drawDirectionMarker(x,y,strength,size=1){
- g.save();g.translate(x,y);g.scale(size,size);
+// Original-style lane markers: fifteen sweep positions and a raised repeat of the center.
+// The raised marker is not a new timing position. Half-steps remain orange adjacent pairs.
+function drawDirectionMarker(x,y,strength,scaleX,scaleY){
+ g.save();g.translate(x,y);g.scale(scaleX,scaleY);
  // Independently drawn stepped upright silhouette, rather than Christmas bulbs.
  g.fillStyle=strength===2?'#ffff00':strength===1?'#fc4c02':'#660900';
  g.beginPath();g.moveTo(-3,0);g.lineTo(3,0);g.lineTo(3,-4);
@@ -950,32 +1027,43 @@ function aimGuideGeometry(){
  }):[];
  cam=saved;
  if(!center)return null;
- const gap=(positions[positions.length-1]-positions[0])/(LAMPS-1);
- return {positions,cy:center[1],size:Math.min(1.01,Math.max(.77,gap/8.5)),centerX:center[0]*scale};
+ const gap=Math.min(...positions.slice(1).map((x,i)=>x-positions[i]));
+ // Widen to the smallest neighboring pitch, reserving a gap at phone scale.
+ const rowScaleX=Math.min(.88,(gap-.65)/6);
+ return {positions,cy:center[1],size:rowScaleX,rowScaleX,centerX:center[0]*scale};
 }
 function aimHud(){
  g.save();
  const guide=aimGuideGeometry();
  if(guide){
-  const {positions,cy,size,centerX}=guide;
-  for(let i=0;i<LAMPS;i++)drawDirectionMarker(positions[i],cy,lampPhase(i,sweepSlot),size);
-  drawDirectionMarker(centerX,cy-15*size,0,size);
+  const {positions,cy,rowScaleX,centerX}=guide, middle=(LAMPS-1)/2;
+  const midPhase=lampPhase(middle,sweepSlot);
+  // Stretch vertically to improve legibility while staying clear of Santa and the ball.
+  for(let i=0;i<LAMPS;i++)drawDirectionMarker(positions[i],cy,i===middle?midPhase:lampPhase(i,sweepSlot),rowScaleX,1.40);
+  drawDirectionMarker(centerX,cy-22,midPhase,1.32,1.60);
  }
  g.fillStyle='#14253be8';g.fillRect(20,535,314,27);g.strokeStyle='#e0bd7f';g.lineWidth=1;g.strokeRect(20,535,314,27);g.fillStyle='#f9dfa7';g.textAlign='center';
  g.font='900 14px Trebuchet MS';g.fillText(state==='aim'?'STOP THE ARROW · TAP OR SPACE':'DIRECTION LOCKED',177,553);g.restore();
 }
 function foldRagdoll(p){
  if(!p.down)return {x:p.x,z:p.z,y:p.y,rx:0,ry:0,rz:0,style:p.id%4,age:0,energy:0,legs:0,arms:0,catching:0};
- const age=Math.max(0,time-(p.fellAt??time)),style=p.id%4,dir=Math.sign(p.hitX||p.x||1),
- hold=[.034,.07,.03,.23][style], travel=ease(age/(hold+.16)),fall=ease((age-hold)/.45),energy=(1-ease((age-.46)/.65)),
- swing=Math.sin(age*(style===1?18:12)),lift=[.015,.04,.14,.025][style]*fall*energy;
- // Visual pose offsets only. The stable physical trajectory and counted contact are unchanged.
- const tuck=style===2?Math.sin(fall*Math.PI):0;
- return {x:mix(p.impactX??p.x,p.x,travel),z:mix(p.impactZ??p.z,p.z,travel),
- y:p.y*travel+lift,rx:p.rx*fall+(style===0?-.21:style===3?.32:.12)*swing*energy,
- ry:p.ry*fall+(style===2?dir*fall*3.05:style===1?dir*.45:0)*energy,
- rz:p.rz*fall+(style===1?dir*.65:style===2?dir*1.65:dir*.14)*Math.sin(fall*Math.PI)*energy,
- style,age,energy,legs:tuck,arms:swing*energy,catching:style===3?Math.sin(ease(age/.44)*Math.PI):0};
+ const age=Math.max(0,time-(p.fellAt??time)),style=p.id%4,dir=Math.sign(p.hitX||p.x||1);
+ // First contact reads in the very first rendered pose. The simulation still
+ // owns the award, direction and velocity; this visual spring only settles.
+ const settle=ease((age-.16)/.43),fall=ease(age/[.34,.39,.45,.49][style]),energy=1-ease((age-.43)/.57);
+ const recoil=(1-ease(age/.21))*(.145+style*.014),swing=Math.sin(age*(style===1?18:12));
+ const fx=p.hitX??0,fz=p.hitZ??1;
+ const yaw=Math.atan2(fx,Math.abs(fz)+.18),targetSign=fz<0?-1:1;
+ const rawX=mix(p.impactX??p.x,p.x,.13+.87*ease(age/.23))+recoil*fx/(Math.hypot(fx,fz)||1)*.54;
+ const rawZ=mix(p.impactZ??p.z,p.z,.13+.87*ease(age/.23))+recoil*fz/(Math.hypot(fx,fz)||1)*.54;
+ return {
+  x:clamp(rawX,-1.77,1.77),z:clamp(rawZ,DECK-1.05,DECK+3.62),
+  y:p.y+.10*Math.sin(fall*R)*energy,
+  rx:mix(p.rx*fall+targetSign*recoil+(.02+style*.07)*swing*energy,targetSign*[1.48,1.58,1.56,1.63][style],settle),
+  ry:mix(p.ry*fall,yaw+dir*[.11,.36,.89,-.45][style],settle)+(style===2?dir*1.33*Math.sin(fall*R):0)*energy,
+  rz:mix(p.rz*fall+dir*(.06+style*.10)*Math.sin(fall*R)*energy,dir*[.16,.59,.40,.29][style],settle),
+  style,age,energy,legs:style===2?Math.sin(fall*R):0,arms:swing*energy+recoil*1.42,catching:style===3?Math.sin(ease(age/.44)*R):0
+ };
 }
 function actorBeat(p){
  const age=Math.max(0,time-(p.fellAt??time)),local=time*(p.id%2?3.2:4.0)+p.id*.83;
@@ -1309,7 +1397,7 @@ const northCharacterGL=(()=>{
  }
  mesh('northFloppyCap',verts);
  // A pointed swept goatee (thin at the bottom, wide beneath the cheeks).
- revolve('northElfBeard',[[0,.006],[.08,.22],[.25,.43],[.46,.70],[.69,.91],[.81,1],[.91,.89],[1,.63],[1.02,.007]],10);
+ revolve('northElfBeard',NORTH_ELF_BEARD_PROFILE,10);
  const tube=[],N2=9,knots=NORTH_ELF_CURL;
  function toe(i,j){
   const [x,y,r]=knots[i],a=knots[Math.max(0,i-1)],b=knots[Math.min(i+1,knots.length-1)],n=norm(a[1]-b[1],b[0]-a[0],0),ang=j*2*R/N2,v=[n[0]*Math.cos(ang),n[1]*Math.cos(ang),Math.sin(ang)];
