@@ -184,6 +184,7 @@ const STEP=1/120,DECK=32,SPEED=15.5,EDGE=2.36,DELIVERY=.21,clack=[];
 let sweepSlot=0,sweepStarted=0,sweepPaused=null,forecasting=false,heckler=-1,heckleAt=-100,nextHeckle=0,mischief=false;
 function launchBall(a){const z=1.42,cell=Math.round(a*14+14),offset=(Math.floor(cell*100/28)-50)/50;return {x:0,z,y:.32,vx:SPEED*offset*5.8/(DECK-z),vz:SPEED,spin:0,gutter:false};}
 // Observed in the matched 1999 PC timing/input source, not a port of its code.
+function activeBreak(){return mischief&&state==='aim'&&time-heckleAt<1.62;}
 const LAMPS=15,SLOT_MS=20,SLOTS=LAMPS*2-1,SPLIT=354;
 function slotAt(ms){
  const t=Math.floor(Math.max(0,ms)/SLOT_MS+1e-9)%(2*SLOTS);
