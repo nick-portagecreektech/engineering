@@ -35,21 +35,14 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .stage .gpu-lane[hidden]{display:none}
 .stage .overlay{z-index:2}
 
-.manual-controls{display:grid;grid-template-columns:1fr 1fr 1.45fr;gap:8px;margin:0 12px 9px;align-items:stretch}
-.manual-controls button{min-height:54px;min-width:0;font-size:12px;touch-action:none;user-select:none;-webkit-user-select:none}
-.manual-controls .dir{font-size:21px;letter-spacing:0;line-height:1;background:#304c43}
-.manual-controls .dir small{font-size:9px;margin-left:6px;color:#ecd3a7;letter-spacing:.09em}
-.manual-controls .dir:disabled{opacity:.49}
-.manual-controls #roll{min-width:0;font-size:14px}
-.manual-status{flex:0 0 auto;text-align:right;color:#edce90;font:bold 11px monospace;min-width:63px}
-.bar{padding-bottom:7px}.footer a{color:#dadab0}
+.bar{padding-bottom:8px}.footer a{color:#dadab0}
 .elf-heckle{position:absolute;z-index:2;left:56.7%;right:1.7%;bottom:2.8%;padding:7px 8px;pointer-events:none;border-radius:7px;border:1px solid #e2ad63;background:#172637f6;box-shadow:0 2px 9px #07101eaa;color:#fff3d1;line-height:1.18;min-height:38px}
 .elf-heckle[hidden]{display:none}.elf-heckle strong{display:block;color:#ffc773;font:800 clamp(8px,2vw,11px)/1.1 system-ui,sans-serif;text-transform:uppercase;letter-spacing:.09em;margin-bottom:3px}
 .elf-heckle span{display:block;font:700 clamp(11px,2.7vw,17px)/1.18 system-ui,sans-serif}
 .elf-heckle.flash{animation:word-pop .22s ease-out}@keyframes word-pop{from{opacity:.6;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media(max-width:430px){.manual-controls{margin:0 6px 8px;gap:6px}.manual-controls button{min-height:50px}.bar{padding-bottom:5px}.elf-heckle{padding:5px}.manual-status{font-size:9px}}
+@media(max-width:430px){.bar{padding-bottom:8px}.elf-heckle{padding:5px}}
 @media(prefers-reduced-motion:reduce){.elf-heckle.flash{animation:none}}
-</style></head><body><main class="window"><div class="title"><span>❄ NORTH POLE STRIKE 3D.exe</span><span>★</span></div><header><h1>NORTH POLE STRIKE<small>3D NIGHT-SHIFT BOWLING</small></h1><button id="mute" aria-label="Enable sound">♪ OFF</button></header><section class="scores" id="scores" aria-label="Ten-frame bowling scorecard"></section><section class="stage"><canvas id="lane" width="640" height="570" tabindex="0" aria-label="Split view of the bowling lane and pin deck. Use Left and Right arrows to aim, then Space to bowl."></canvas><div id="elfHeckle" class="elf-heckle" role="status" aria-live="polite" aria-atomic="true" hidden><strong id="elfName"></strong><span id="elfLine"></span></div><div class="overlay" id="overlay"><div class="card"><h2>THE ELVES<br>ARE ON STRIKE.</h2><p>Santa has a different kind of strike in mind.<br><b>Aim with the arrows. Then bowl.</b><br>Ten frames. Ten cheeky elves. One big red ball.</p><button id="start">LET’S BOWL! ▶</button><small>Hold an arrow to sweep across the lane. Press Space or tap Bowl to throw.</small></div></div></section><div class="bar"><div><strong id="message" aria-live="polite">THE NORTH POLE IS CLOSED FOR BOWLING.</strong><small id="hint">Choose a direction, then bowl.</small></div><output id="aimValue" class="manual-status" aria-label="Aim direction">CENTER</output></div><div class="manual-controls" role="group" aria-label="Aim and bowl controls"><button id="aimLeft" class="dir" aria-label="Aim left" aria-keyshortcuts="ArrowLeft" disabled>◀ <small>LEFT</small></button><button id="aimRight" class="dir" aria-label="Aim right" aria-keyshortcuts="ArrowRight" disabled>▶ <small>RIGHT</small></button><button id="roll" aria-label="Bowl" aria-keyshortcuts="Space" disabled>BOWL! ▶</button></div><div class="status"><span id="turn">FRAME 1 / 10</span><span id="best">BEST 0</span></div><div class="footer">An original holiday bowling tribute. Voice: <a href="https://opengameart.org/content/orc-voice" target="_blank" rel="noopener">Tim Rockk</a>, <a href="https://freesound.org/people/HydraSound/sounds/736274/" target="_blank" rel="noopener">HydraSound</a> and <a href="https://freesound.org/people/canucklovingbrit/sounds/110642/" target="_blank" rel="noopener">canucklovingbrit</a> (CC0). <span>New taunts by Sadiquecat: <a href="https://freesound.org/people/Sadiquecat/sounds/818209/" target="_blank" rel="noopener">intro</a>, <a href="https://freesound.org/people/Sadiquecat/sounds/818215/" target="_blank" rel="noopener">miss</a>, <a href="https://freesound.org/people/Sadiquecat/sounds/818217/" target="_blank" rel="noopener">survivor</a>, <a href="https://freesound.org/people/Sadiquecat/sounds/818212/" target="_blank" rel="noopener">idle</a> (CC0); <a href="https://freesound.org/people/Legnalegna55/sounds/536896/" target="_blank" rel="noopener">Legnalegna55</a> and <a href="https://opengameart.org/content/group-giggling" target="_blank" rel="noopener">AuraVoice</a> (CC0).</span></div></main><script>
+</style></head><body><main class="window"><div class="title"><span>❄ NORTH POLE STRIKE 3D.exe</span><span>★</span></div><header><h1>NORTH POLE STRIKE<small>3D NIGHT-SHIFT BOWLING</small></h1><button id="mute" aria-label="Enable sound">♪ OFF</button></header><section class="scores" id="scores" aria-label="Ten-frame bowling scorecard"></section><section class="stage"><canvas id="lane" width="640" height="570" tabindex="0" aria-label="Split view of the bowling lane and pin deck. Click or tap the lane, or press Space or Enter, to stop the sweeping lights and bowl in one action."></canvas><div id="elfHeckle" class="elf-heckle" role="status" aria-live="polite" aria-atomic="true" hidden><strong id="elfName"></strong><span id="elfLine"></span></div><div class="overlay" id="overlay"><div class="card"><h2>THE ELVES<br>ARE ON STRIKE.</h2><p>Santa has a different kind of strike in mind.<br><b>Catch the light. That’s your shot.</b><br>Ten frames. Ten cheeky elves. One big red ball.</p><button id="start">LET’S BOWL! ▶</button><small>Click or tap the lane, or press Space or Enter. One press aims and throws.</small></div></div></section><div class="bar"><div><strong id="message" aria-live="polite">THE NORTH POLE IS CLOSED FOR BOWLING.</strong><small id="hint">One press stops the light and throws.</small></div><button id="roll" aria-label="Stop the light and bowl" aria-keyshortcuts="Space Enter" disabled>BOWL! ▶</button></div><div class="status"><span id="turn">FRAME 1 / 10</span><span id="best">BEST 0</span></div><div class="footer">An original holiday bowling tribute. Voice: <a href="https://opengameart.org/content/orc-voice" target="_blank" rel="noopener">Tim Rockk</a>, <a href="https://freesound.org/people/HydraSound/sounds/736274/" target="_blank" rel="noopener">HydraSound</a> and <a href="https://freesound.org/people/canucklovingbrit/sounds/110642/" target="_blank" rel="noopener">canucklovingbrit</a> (CC0). <span>New taunts by Sadiquecat: <a href="https://freesound.org/people/Sadiquecat/sounds/818209/" target="_blank" rel="noopener">intro</a>, <a href="https://freesound.org/people/Sadiquecat/sounds/818215/" target="_blank" rel="noopener">miss</a>, <a href="https://freesound.org/people/Sadiquecat/sounds/818217/" target="_blank" rel="noopener">survivor</a>, <a href="https://freesound.org/people/Sadiquecat/sounds/818212/" target="_blank" rel="noopener">idle</a> (CC0); <a href="https://freesound.org/people/Legnalegna55/sounds/536896/" target="_blank" rel="noopener">Legnalegna55</a> and <a href="https://opengameart.org/content/group-giggling" target="_blank" rel="noopener">AuraVoice</a> (CC0).</span></div></main><script>
 /* CC0 performed voices + original procedural Foley, no network. */
 (() => {
 'use strict';
@@ -138,7 +131,7 @@ try{best=+localStorage.getItem('north-pole-best')||0;muted=localStorage.getItem(
 const chatter=['WE DEMAND COCOA!','NOT IN MY CONTRACT!','SANTA, USE THE STAIRS!','NICE SHOES, BIG GUY.','I SHOULD HAVE CALLED IN ELF.'];
 function sound(freq,dur=.1,type='sine'){if(muted||window.northAudio)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();audio.resume();let o=audio.createOscillator(),v=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,audio.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(50,freq*.6),audio.currentTime+dur);v.gain.setValueAtTime(.07,audio.currentTime);v.gain.exponentialRampToValueAtTime(.001,audio.currentTime+dur);o.connect(v).connect(audio.destination);o.start();o.stop(audio.currentTime+dur);}catch{}}
 function announce(msg,tip){$('message').textContent=msg;$('hint').textContent=tip||'Tap when the arrow lines up. Space works too.';}
-function scoreUI(){const totals=bowlingScores(frames);$('scores').innerHTML=Array.from({length:10},(_,i)=>{let a=frames[i]||[],text=a.map((n,j)=>{if(n===10&&(j===0||i===9&&(a[j-1]===10||j===2&&a[0]<10&&a[0]+a[1]===10)))return 'X';if(j>0&&a[j-1]+n===10&&(j===1||i===9&&a[0]===10))return '/';return n===0?'–':n;}).join(' ');return '<div class="frame '+(i===frame?'active':'')+'"><b>'+ (i+1)+'</b><em>'+text+'</em><strong>'+(totals[i]??'')+'</strong></div>';}).join('');$('turn').textContent=state==='over'?'GAME COMPLETE':'FRAME '+(frame+1)+' / 10 · BALL '+((frames[frame]?.length||0)+1);$('best').textContent='BEST '+best;$('roll').disabled=state!=='aim';syncAim();$('mute').textContent=muted?'♪ OFF':'♪ ON';$('mute').setAttribute('aria-label',muted?'Enable sound':'Mute sound');}
+function scoreUI(){const totals=bowlingScores(frames);$('scores').innerHTML=Array.from({length:10},(_,i)=>{let a=frames[i]||[],text=a.map((n,j)=>{if(n===10&&(j===0||i===9&&(a[j-1]===10||j===2&&a[0]<10&&a[0]+a[1]===10)))return 'X';if(j>0&&a[j-1]+n===10&&(j===1||i===9&&a[0]===10))return '/';return n===0?'–':n;}).join(' ');return '<div class="frame '+(i===frame?'active':'')+'"><b>'+ (i+1)+'</b><em>'+text+'</em><strong>'+(totals[i]??'')+'</strong></div>';}).join('');$('turn').textContent=state==='over'?'GAME COMPLETE':'FRAME '+(frame+1)+' / 10 · BALL '+((frames[frame]?.length||0)+1);$('best').textContent='BEST '+best;$('roll').disabled=state!=='aim';$('mute').textContent=muted?'♪ OFF':'♪ ON';$('mute').setAttribute('aria-label',muted?'Enable sound':'Mute sound');}
 function end(){state='over';cueAudio('over');const total=bowlingScores(frames)[9],record=total>best;if(record){best=total;try{localStorage.setItem('north-pole-best',best)}catch{}}$('overlay').innerHTML='<div class="card"><h2>'+total+' POINTS<br>'+(record?'NEW RECORD!':'SHIFT’S OVER!')+'</h2><p>'+(total>=200?'Santa’s got a brand-new bag of strikes.':total>=100?'Not bad for a guy in snow boots.':'The elves appreciate your contribution to workplace safety.')+'</p><button id="again">BOWL AGAIN ↻</button><small>Best on this device: '+best+' · Space to replay</small></div>';$('overlay').classList.remove('hidden');$('again').onclick=start;announce('FINAL SCORE: '+total);scoreUI();sound(880,.3);}
 
 const W=640,H=570,R=Math.PI,clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),mix=(a,b,t)=>a+(b-a)*t,ease=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
@@ -187,34 +180,34 @@ function ball(x,y,z,theta){const T=pose(x,y,z,theta,-.18,.2);round(T,0,0,0,.31,.
 
 // Lane units; top-view contact solver with independent 3D falling motion.
 let pins=[],B=null,phase=0,shot=0,knocked=0,nextAt=0,locked=0,particles=[],quip='',qtime=0,lastCall='',rollLen=0,acc=0,nearHits=0;
-const STEP=1/120,DECK=32,SPEED=15.5,EDGE=2.36,DELIVERY=.86,clack=[];
-let aimTick=0,heldAim=null,aimMoves=0,freshCue=null,forecasting=false,cueWindows=[],cueBest=0,heckler=-1,heckleAt=-100,nextHeckle=0,mischief=false;
-function launchBall(a){const x=.54,z=1.42;return {x,z,y:.32,vx:SPEED*(a*3.34-x)/(DECK-z),vz:SPEED,spin:0,gutter:false};}
-function forecastCues(){
- // Same ball and fixed-step collisions as live play; no DOM, audio, randomness or world mutation.
- const fresh=pins.length===10; if(fresh&&freshCue){[cueBest,cueWindows]=freshCue;return;}
- const saved=[pins,B,state,phase,rollLen,knocked,nearHits,lastCall],counts=[];
- forecasting=true;
- try{for(let i=0;i<=160;i++){pins=saved[0].map(p=>({...p}));B=launchBall((i-80)/80);state='roll';phase=rollLen=knocked=nearHits=0;
- for(let k=0;k<530&&state!=='forecastDone';k++)sim(STEP);counts.push(knocked);}}
- finally{[pins,B,state,phase,rollLen,knocked,nearHits,lastCall]=saved;forecasting=false;}
- cueBest=Math.max(...counts);cueWindows=[];
- for(let i=0;i<=160;){if(!cueBest||counts[i]!==cueBest){i++;continue}let j=i;while(j<160&&counts[j+1]===cueBest)j++;
- cueWindows.push([Math.max(-1,(i-80-.48)/80),Math.min(1,(j-80+.48)/80)]);i=j+1;}
- if(fresh)freshCue=[cueBest,cueWindows];
+const STEP=1/120,DECK=32,SPEED=15.5,EDGE=2.36,DELIVERY=.21,clack=[];
+let sweepSlot=0,sweepStarted=0,sweepPaused=null,forecasting=false,heckler=-1,heckleAt=-100,nextHeckle=0,mischief=false;
+function launchBall(a){const z=1.42,cell=Math.round(a*14+14),offset=(Math.floor(cell*100/28)-50)/50;return {x:0,z,y:.32,vx:SPEED*offset*5.8/(DECK-z),vz:SPEED,spin:0,gutter:false};}
+// Observed in the matched 1999 PC timing/input source, not a port of its code.
+const LAMPS=15,SLOT_MS=20,SLOTS=LAMPS*2-1,SPLIT=354;
+function slotAt(ms){
+ const t=Math.floor(Math.max(0,ms)/SLOT_MS+1e-9)%(2*SLOTS);
+ return t<SLOTS?t:(2*SLOTS-1)-t;
 }
-function activeBreak(){return mischief&&state==='aim'&&time-heckleAt<1.62;}
-function cueGood(a){return cueWindows.some(([l,r])=>a>=l&&a<=r)}
-const SPLIT=354;
+function resetSweep(){sweepStarted=last;sweepSlot=0;aim=-1;}
+function scanSweep(t){sweepSlot=slotAt(t-sweepStarted);aim=(sweepSlot-(LAMPS-1))/(LAMPS-1);}
+function lampPhase(lamp,slot){const d=Math.abs(lamp*2-slot);return d===0?2:d===1?1:0;}
 function aimHud(){
- const lock=state!=='aim',a=lock?locked:aim,x=176+a*131;
- g.fillStyle='#17263df3';g.fillRect(18,496,317,58);g.strokeStyle='#e8b965';g.strokeRect(18,496,317,58);
- g.textAlign='center';g.font='900 15px Trebuchet MS';g.fillStyle='#f8deb0';
- g.fillText(lock?'DIRECTION LOCKED':pins.length===10?'SET YOUR DIRECTION':'AIM AT THE SURVIVORS',176,515);
- g.fillStyle='#637489';g.fillRect(45,536,262,5);
- for(const [l,r] of cueWindows){g.fillStyle='#ca9b55';g.fillRect(176+l*131,534,Math.max(2,(r-l)*131),9);}
- g.beginPath();g.moveTo(x,526);g.lineTo(x-8,541);g.lineTo(x-3,539);g.lineTo(x-3,548);g.lineTo(x+3,548);g.lineTo(x+3,539);g.lineTo(x+8,541);g.closePath();
- g.fillStyle=cueGood(a)?'#fff3ab':lock?'#e1b685':'#f87e70';g.fill();
+ const z=6.5,lanePixels=SPLIT/W;g.save();
+ const saved=cam;sceneCamera('lane');
+ for(let i=0;i<LAMPS;i++){
+  const pt=project([(i-7)*.274,.03,z]);if(!pt)continue;
+  const x=pt[0]*lanePixels,y=pt[1],phase=lampPhase(i,sweepSlot);
+  if(phase){g.shadowColor='#f8b54c';g.shadowBlur=phase===2?17:10;}
+  g.beginPath();g.moveTo(x,y-9);g.lineTo(x-5.6,y+2.8);g.lineTo(x-2.8,y+2.2);g.lineTo(x-2.8,y+6.6);g.lineTo(x+2.8,y+6.6);g.lineTo(x+2.8,y+2.2);g.lineTo(x+5.6,y+2.8);g.closePath();
+  g.fillStyle=phase===2?'#fff0a0':phase===1?'#f9a94f':'#712c34';g.fill();g.shadowBlur=0;
+  g.strokeStyle=phase?'#9c4230':'#e6bd865e';g.lineWidth=1.2;g.stroke();
+  if(i===7){g.fillStyle='#912f36';g.fillRect(x-2.2,y-17,4.4,5);}
+ }
+ cam=saved;
+ g.fillStyle='#14253be8';g.fillRect(20,516,314,37);g.strokeStyle='#e0bd7f';g.strokeRect(20,516,314,37);g.fillStyle='#f9dfa7';g.textAlign='center';
+ g.font='900 15px Trebuchet MS';g.fillText(state==='aim'?'TAP OR PRESS SPACE / ENTER':'LOCKED',177,539);
+ g.restore();
 }
 function foldRagdoll(p){
  if(!p.down)return {x:p.x,z:p.z,y:p.y,rx:0,ry:0,rz:0,style:p.id%4,age:0,energy:0,legs:0,arms:0,catching:0};
@@ -272,33 +265,15 @@ function animationEvents(){
  if(captionHot&&time>=qtime){$('elfHeckle').hidden=true;captionHot=false;}
  if(state!=='aim'||time<nextHeckle||!pins.length)return;
  const index=(heckleSerial+shot+frame)%idleBits.length;
- const wanted=aimMoves===0&&heckleSerial%3===1?{line:'Interesting.',clip:'interesting',move:'peek'}:idleBits[index];
+ const wanted=heckleSerial%3===1?{line:'Interesting.',clip:'interesting',move:'peek'}:idleBits[index];
  showHeckle(wanted.line===quip?idleBits[(index+1)%idleBits.length]:wanted);
-}
-function syncAim(){
- const a=Math.round(aim*80),on=state==='aim';
- $('aimLeft').disabled=!on||a<=-80;$('aimRight').disabled=!on||a>=80;
- $('aimValue').textContent=a===0?'CENTER':(a<0?'← ':'→ ')+Math.abs(Math.round(a*1.25))+'%';
-}
-function aimBy(dir,steps=1){
- if(state!=='aim')return false;
- const last=aimTick;aimTick=clamp(aimTick+dir*steps,-80,80);aim=aimTick/80;
- if(aimTick===last)return false;
- syncAim();aimMoves++;
- if(aimMoves>=5&&time>=nextHeckle-2.1&&!captionHot){aimMoves=0;showHeckle(heckleSerial%2?{line:'That’s not happening.',clip:'notHappening',move:'point'}:idleBits[(heckleSerial+3+frame)%idleBits.length]);}
- return true;
-}
-function stopAim(){heldAim=null}
-function aimPulse(){
- if(!heldAim||state!=='aim')return;
- if(time>=heldAim.next){aimBy(heldAim.dir,heldAim.fine?1:time-heldAim.start>.74?4:2);heldAim.next=time+.052;}
 }
 function cueAudio(name,data={}){try{window.northAudio?.cue(name,data)}catch{}}
 
 function rack(){pins=[];for(let i=0;i<4;i++)for(let j=0;j<=i;j++){let x=(j-i/2)*.75,z=DECK+i*.70;pins.push({id:pins.length,x,z,y:0,vx:0,vz:0,vy:0,rx:0,ry:0,rz:0,wx:0,wz:0,down:false,moving:false})}}
-function resetTurn(){phase=0;B=null;state='aim';stopAim();forecastCues();scoreUI();announce('SET YOUR DIRECTION.','Use ◀ ▶ to aim, then Bowl. Gold marks useful angles.');nextHeckle=Math.max(nextHeckle,time+2.45)}
-function start(){frames=[[]];frame=0;shot=0;particles=[];acc=0;aim=aimTick=aimMoves=heckleSerial=0;heckler=-1;nextHeckle=time;captionHot=false;rack();resetTurn();$('overlay').classList.add('hidden');try{window.northAudio?.mute(muted)}catch{}cueAudio('start');showHeckle({line:'Come on!',clip:'comeOn',move:'point'},pins,2,true);sound(550,.14);}
-function bowl(){if(state!=='aim')return;stopAim();locked=aim;state='approach';phase=0;knocked=0;nearHits=0;rollLen=0;shot++;scoreUI();announce('AIM LOCKED.','Watch Santa lift, plant and release.');cueAudio('lock',{good:cueGood(locked)});sound(180,.2,'triangle')}
+function resetTurn(){phase=0;B=null;state='aim';resetSweep();scoreUI();announce('WATCH THE LIGHTS.','Tap the lane or press Space / Enter to bowl.');nextHeckle=Math.max(nextHeckle,time+2.45)}
+function start(){frames=[[]];frame=0;shot=0;particles=[];acc=0;heckleSerial=0;heckler=-1;nextHeckle=time;captionHot=false;rack();resetTurn();$('overlay').classList.add('hidden');c.focus?.({preventScroll:true});try{window.northAudio?.mute(muted)}catch{}cueAudio('start');showHeckle({line:'Come on!',clip:'comeOn',move:'point'},pins,2,true);sound(550,.14);}
+function bowl(){if(state!=='aim'||last-sweepStarted<SLOT_MS)return;locked=aim;state='approach';phase=0;knocked=0;nearHits=0;rollLen=0;shot++;scoreUI();announce('AIM LOCKED.','Watch Santa lift, plant and release.');cueAudio('lock');sound(180,.2,'triangle')}
 function launch(){state='roll';phase=0;B=launchBall(locked);announce('BALL AWAY!','Watch the deck.');cueAudio('release',{aim:locked});sound(180,.27,'triangle')}
 function push(p,vx,vz){let j=Math.hypot(vx,vz);if(j<.22)return;p.vx+=vx;p.vz+=vz;if(!p.down&&Math.hypot(p.vx,p.vz)>.61){p.down=true;p.moving=true;p.vy=.95+j*.22;p.wx=-p.vz*1.45;p.wz=p.vx*2.3;knocked++;if(forecasting)return;p.fellAt=time;p.impactX=p.x;p.impactZ=p.z;p.hitX=vx;p.hitZ=vz;cueAudio('pin',{index:p.id,force:j,count:knocked});if(nearHits++<5)sound(165+p.id*23,.08,'triangle');for(let i=0;i<6;i++)particles.push({x:p.x,y:.55,z:p.z,vx:(Math.random()-.5)*3,vz:(Math.random()-.5)*3,vy:1+Math.random()*2,l:1+Math.random()*.4})}}
 function sim(dt){
@@ -326,7 +301,7 @@ function recordRoll(){const a=frames[frame];a.push(knocked);const spare=a.length
  showHeckle(bit,alive,-1,true);
  announce(spare?'SPARE!':knocked===10?'STRIKE!':knocked?knocked+' ELVES DOWN.':B?.gutter?'GUTTER BALL.':'NO CONTACT.',knocked===10?'All ten are taking a snow day.':knocked?'Watch for the sweep.':'Read the deck and line up again.');
  state='result';nextAt=time+(knocked===0?1.13:1.02);phase=0;scoreUI();cueAudio('result',{pins:knocked,hit:knocked,strike:knocked===10&&!spare,spare});if(spare||knocked===10){sound(520,.18);sound(780,.3)}}
-function nextRoll(){let a=frames[frame];if(frameDone(frame,a)){if(frame===9){end();return;}frame++;frames.push([]);rack();}else if(frame===9&&(a[a.length-1]===10||a.length===2&&a[0]+a[1]===10)){rack();}else pins=pins.filter(p=>!p.down);resetTurn();announce(pins.length===10?'FRESH RACK. SAME ATTITUDE.':pins.length+' LEFT STANDING.','Use ◀ ▶ to line up the next shot.');}
+function nextRoll(){let a=frames[frame];if(frameDone(frame,a)){if(frame===9){end();return;}frame++;frames.push([]);rack();}else if(frame===9&&(a[a.length-1]===10||a.length===2&&a[0]+a[1]===10)){rack();}else pins=pins.filter(p=>!p.down);resetTurn();announce(pins.length===10?'FRESH RACK. SAME ATTITUDE.':pins.length+' LEFT STANDING.','Catch the light to bowl again.');}
 
 // Perspective, camera choreography and animated 3D set.
 let skyF=0;
@@ -336,11 +311,11 @@ function delivery(k,follow=0){
  const plant=ease((k-.29)/.39),hip=ease((k-.55)/.45),f=ease(follow/.62);
  const ballY=k<.24?mix(.97,1.58,raise):k<.52?mix(1.58,1.07,back):mix(1.07,.32,drive);
  const ballZ=k<.24?mix(.16,.53,raise):k<.52?mix(.53,-.48,back):mix(-.48,1.42,drive);
- const stride={x:mix(-.14,-.05,hip),z:mix(-.15,.38,hip),y:-.28*hip+.22*f,lean:.43*hip-.30*f,twist:.32*back-.60*drive+.27*f,
+ const stride={x:mix(-.39,-.46,hip),z:mix(-.15,.38,hip),y:-.28*hip+.22*f,lean:.43*hip-.30*f,twist:.32*back-.60*drive+.27*f,
  left:[-.34,.095+.11*Math.sin(plant*R),mix(-.02,.86,plant)],
  right:[.22,.095+.15*hip-.11*f,-.49-.13*hip]};
- stride.ball=[mix(.36,.54,drive),ballY,ballZ];stride.hand=[stride.ball[0]-.04,stride.ball[1]+.11,stride.ball[2]-.207];
- if(follow>0){stride.hand=[.40+.17*f,mix(.43,1.64,ease(follow/.25))-.71*ease((follow-.28)/.42),1.213-.30*f];}
+ stride.ball=[mix(.17,0,drive),ballY,ballZ];stride.hand=[stride.ball[0]-.04,stride.ball[1]+.11,stride.ball[2]-.207];
+ if(follow>0){stride.hand=[-.04+.17*f,mix(.43,1.64,ease(follow/.25))-.71*ease((follow-.28)/.42),1.213-.30*f];}
  return stride;
 }
 function sceneCamera(view='lane'){
@@ -641,24 +616,23 @@ function draw(){if(gpu){try {gpu.draw();return;}catch(err){console.warn('North P
 initNorthGL();
 
 
-function tick(t){let dt=Math.min((t-last)/1000||.016,.04);last=t;if(!document.hidden){time+=dt;aimPulse();acc+=dt;while(acc>=STEP){sim(STEP);acc-=STEP}if(state==='result'){phase+=dt;if(time>=nextAt)nextRoll()}particles=particles.filter(p=>(p.l-=dt)>0);particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;p.vy-=3.6*dt;});animationEvents();}
+function tick(t){let dt=Math.min((t-last)/1000||.016,.04);last=t;if(!document.hidden){time+=dt;if(state==='aim')scanSweep(t);acc+=dt;while(acc>=STEP){sim(STEP);acc-=STEP}if(state==='result'){phase+=dt;if(time>=nextAt)nextRoll()}particles=particles.filter(p=>(p.l-=dt)>0);particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;p.vy-=3.6*dt;});animationEvents();}
  draw();requestAnimationFrame(tick);}
 
-$('start').onclick=start;$('roll').onclick=bowl;$('mute').onclick=()=>{muted=!muted;try{localStorage.setItem('north-pole-sound',muted?'0':'1')}catch{}scoreUI();try{window.northAudio?.mute(muted)}catch{}sound(660);};for(const [id,dir] of [['aimLeft',-1],['aimRight',1]]){
- const el=$(id);
- el.addEventListener('pointerdown',e=>{if(e.button!==0||state!=='aim'||heldAim)return;e.preventDefault();aimBy(dir);try{el.setPointerCapture(e.pointerId)}catch{}heldAim={dir,id:e.pointerId,start:time,next:time+.24,fine:false};});
- for(const type of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(type,e=>{if(heldAim?.id===e.pointerId)stopAim();});
- el.onclick=e=>{if(!e||e.detail===0)aimBy(dir);};
-}
-window.addEventListener('pointerup',e=>{if(heldAim?.id===e.pointerId)stopAim();});
-window.addEventListener('pointercancel',e=>{if(heldAim?.id===e.pointerId)stopAim();});
-window.addEventListener('blur',stopAim);
+$('start').onclick=start;$('roll').onclick=bowl;$('mute').onclick=()=>{muted=!muted;try{localStorage.setItem('north-pole-sound',muted?'0':'1')}catch{}scoreUI();try{window.northAudio?.mute(muted)}catch{}sound(660);};c.addEventListener('pointerdown',e=>{if((e.button!==0&&!(e.pointerType==='mouse'&&[1,2].includes(e.button)))||state!=='aim')return;e.preventDefault();bowl();});
+c.addEventListener('contextmenu',e=>e.preventDefault());
+c.addEventListener('auxclick',e=>e.preventDefault());
 window.addEventListener('keydown',e=>{
- if(e.code==='ArrowLeft'||e.code==='ArrowRight'){if(state!=='aim')return;e.preventDefault();if(!e.repeat){const dir=e.code==='ArrowLeft'?-1:1;aimBy(dir,1);heldAim={dir,id:e.code,start:time,next:time+.24,fine:e.shiftKey};}return;}
- if(e.code!=='Space'||e.repeat||(e.target.tagName==='BUTTON'&&e.target.id!=='aimLeft'&&e.target.id!=='aimRight')||e.target.tagName==='A')return;
- e.preventDefault();state==='intro'||state==='over'?start():bowl();
+ if(!['Space','Enter','NumpadEnter'].includes(e.code)||e.repeat||(e.target.tagName==='BUTTON'&&e.target.id!=='roll')||e.target.tagName==='A')return;
+ if(e.shiftKey&&e.code!=='Space'){if(e.target.id==='roll')e.preventDefault();return;}
+ if(state==='intro'||state==='over'){if(e.code!=='Space'){e.preventDefault();start();}return;}
+ e.preventDefault();bowl();
 });
-window.addEventListener('keyup',e=>{if(heldAim?.id===e.code)stopAim();});
-document.addEventListener('visibilitychange',()=>{last=performance.now();stopAim();});
-rack();scoreUI();if(typeof requestIdleCallback==='function')requestIdleCallback(()=>{if(state==='intro')forecastCues();},{timeout:500});requestAnimationFrame(tick);
+document.addEventListener('visibilitychange',()=>{
+ const now=performance.now();
+ if(document.hidden)sweepPaused=now;
+ else if(sweepPaused!==null){sweepStarted+=now-sweepPaused;sweepPaused=null;}
+ last=now;
+});
+rack();scoreUI();requestAnimationFrame(tick);
 </script></body></html>
