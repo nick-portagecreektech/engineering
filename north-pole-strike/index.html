@@ -719,7 +719,7 @@ function quad(x,z,w,d,y,col){const i=faces.length;face([[x-w/2,y,z-d/2],[x-w/2,y
 function tent(T,x,y,z,r,h,col){const top=T([x,y+h,z]);for(let i=0;i<6;i++){let a=i*R/3,b=(i+1)*R/3;face([T([x+r*Math.cos(a),y,z+r*Math.sin(a)]),top,T([x+r*Math.cos(b),y,z+r*Math.sin(b)])],col)}}
 function paint(){
  faces.sort((a,b)=>(b[4]||0)-(a[4]||0)||b[0]-a[0]);
- for(const [,s,k,ellipse] of faces){
+ for(const [,s,k,ellipse,,flat] of faces){
   g.beginPath();g.fillStyle=k;
   if(ellipse){
    const [x,y,rx,ry,angle]=s;
@@ -737,7 +737,7 @@ function paint(){
    continue;
   }
   g.moveTo(s[0][0],s[0][1]);for(let i=1;i<s.length;i++)g.lineTo(s[i][0],s[i][1]);g.closePath();
-  g.fill();g.strokeStyle=k;g.lineWidth=.55;g.stroke();
+  g.fill();if(!flat){g.strokeStyle=k;g.lineWidth=.55;g.stroke();}
  }
 }
 function mark(s,p,size,col='#fff4dc'){const q=project(p);if(!q)return;g.font='900 '+clamp(size*cam.f/q[2],8,34)+'px Trebuchet MS';g.textAlign='center';g.fillStyle=col;g.fillText(s,q[0],q[1])}
@@ -747,13 +747,81 @@ const NORTH_GOLD='#ffcc67',NORTH_RIBBON='#b62e3e',NORTH_FIR='#1b563e';
 const NORTH_LIGHTS=['#ffd67a','#fe7a65','#f8e4a5','#79d5a3'];
 // Warm, low-contrast cabin details. Off the playing floor, with identical
 // world coordinates in GLSL and the Canvas fallback.
+// Hand-lettered winter wayfinding, physically mounted on the lodge fascia.
+// All lettering and ornament geometry is original. Both render paths share
+// the same solid vector surface; no font, network, or screen-space title.
+const NORTH_PLAQUE=(()=>{
+ const shapes=[],G='#d5a969',EDGE='#56312e',R='#962f37',FIELD='#17392f',CREAM='#fff4d6',GOLD='#ffe094',HOLLY='#44805c';
+ function poly(c,z,p){shapes.push([c,z,p]);}
+ function rect(c,z,x,y,w,h){poly(c,z,[[x,y],[x+w,y],[x+w,y+h],[x,y+h]]);}
+ function band(c,z,a,b,w){
+  const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1,nx=-dy*w*.5/l,ny=dx*w*.5/l;
+  poly(c,z,[[a[0]-nx,a[1]-ny],[b[0]-nx,b[1]-ny],[b[0]+nx,b[1]+ny],[a[0]+nx,a[1]+ny]]);
+ }
+ function disc(c,z,x,y,r){
+  poly(c,z,Array.from({length:10},(_,i)=>[x+r*Math.cos(i*Math.PI*.20),y+r*Math.sin(i*Math.PI*.20)]));
+ }
+ const trim=(w,y0,y1,k)=>[[-w+k,y0],[w-k,y0],[w,y0+k],[w,y1-k],[w-k,y1],[-w+k,y1],[-w,y1-k],[-w,y0+k]];
+ poly(EDGE,37.666,trim(2.12,3.146,4.132,.112));
+ poly(G,37.652,trim(2.065,3.177,4.104,.103));
+ poly(R,37.638,trim(2.023,3.205,4.078,.086));
+ poly(G,37.625,trim(1.947,3.248,4.032,.072));
+ poly(FIELD,37.612,trim(1.920,3.269,4.011,.061));
+ poly('#244638',37.606,[[-1.84,3.919],[1.84,3.919],[1.91,3.970],[1.84,4.005],[-1.84,4.005],[-1.91,3.970]]);
+ // Low red ribbon and left-right holly accents anchor the smaller label.
+ poly('#712b33',37.596,[[-1.020,3.273],[1.020,3.273],[1.122,3.296],[1.062,3.394],[1.130,3.487],[1.020,3.506],[-1.020,3.506],[-1.130,3.487],[-1.062,3.394],[-1.122,3.296]]);
+ rect(R,37.589,-.972,3.286,1.944,.210);
+ for(const s of [-1,1]){
+  const x=s*1.449,xx=s*1.73,y=3.388;
+  band(G,37.590,[x,y],[xx,y],.019);
+  poly(HOLLY,37.581,[[x,y+.008],[x+s*.04,y+.096],[x+s*.091,y+.076],[x+s*.152,y+.120],[x+s*.139,y+.047],[x+s*.193,y+.045],[x+s*.095,y+.010]]);
+  poly(HOLLY,37.581,[[x,y-.006],[x+s*.045,y-.053],[x+s*.105,y-.032],[x+s*.152,y-.068],[x+s*.145,y],[x+s*.087,y+.012]]);
+  disc('#e76b64',37.571,x+.014*s,y+.023,.031);disc('#d74550',37.571,x+.059*s,y+.008,.027);
+  for(const y of [3.320,3.961])disc('#f0b77b',37.602,s*1.864,y,.023);
+ }
+ // High-contrast slab serifs and shaped circular counters. Glyph coordinates
+ // are 0..1 in a cap-height cell and run from the baseline upward.
+ const o=(q,x,y,rx,ry,lo=0,hi=Math.PI*2)=>{
+  const n=12,at=(a,k)=>[x+Math.cos(a)*rx*k,y+Math.sin(a)*ry*k],a=(hi-lo)/n;
+  for(let i=0;i<n;i++){const t=lo+a*i,u=t+a;q([at(t,1),at(u,1),at(u,.68),at(t,.68)]);}
+ };
+ const stem=(r,x)=>{r(x,.06,.172,.89);r(x-.073,0,.317,.122);r(x-.073,.878,.317,.122);};
+ const glyph={
+  N:(r,b,q)=>{stem(r,.101);stem(r,.728);b([.219,.950],[.796,.050],.173);},
+  O:(r,b,q)=>{o(q,.50,.50,.466,.504);},
+  R:(r,b,q)=>{stem(r,.107);o(q,.463,.723,.414,.274,-Math.PI/2,Math.PI/2);r(.23,.885,.262,.113);r(.223,.443,.282,.127);b([.459,.501],[.819,.055],.180);r(.652,0,.335,.129);},
+  T:(r,b,q)=>{stem(r,.414);r(.056,.878,.885,.122);r(.057,.732,.126,.17);r(.817,.732,.125,.17);},
+  H:(r,b,q)=>{stem(r,.101);stem(r,.728);r(.252,.430,.522,.139);},
+  P:(r,b,q)=>{stem(r,.107);o(q,.466,.739,.424,.259,-Math.PI/2,Math.PI/2);r(.231,.879,.266,.121);r(.228,.472,.272,.122);},
+  L:(r,b,q)=>{stem(r,.111);r(.244,0,.647,.129);r(.752,.051,.138,.161);},
+  E:(r,b,q)=>{stem(r,.111);r(.242,0,.663,.123);r(.242,.878,.659,.122);r(.245,.438,.494,.123);r(.763,.048,.138,.144);r(.763,.814,.135,.120);r(.621,.346,.116,.301);},
+  A:(r,b,q)=>{b([.241,.068],[.485,.974],.153);b([.510,.974],[.804,.068],.166);r(.226,.309,.538,.138);r(.074,0,.344,.116);r(.620,0,.327,.116);},
+  S:(r,b,q)=>{o(q,.510,.742,.412,.263,Math.PI*.04,Math.PI*1.10);o(q,.483,.260,.428,.266,-Math.PI*.94,Math.PI*.08);b([.179,.683],[.805,.374],.165);r(.769,.802,.138,.149);r(.083,.047,.138,.152);}
+ };
+ function word(words,base,h,height,gap,color){
+  const chars=[...words],wid=chars.map(k=>k===' '?h*.66:h);
+  let x=-(wid.reduce((a,b)=>a+b,0)+(chars.length-1)*gap)*.5;
+  for(let i=0;i<chars.length;i++){
+   const k=chars[i];if(k===' '){x+=wid[i]+gap;continue;}
+   const z=37.548,y=base;
+   const Q=p=>poly(color,z,p.map(([a,b])=>[x+a*h,y+b*height]));
+   const r=(a,b,w,t)=>Q([[a,b],[a+w,b],[a+w,b+t],[a,b+t]]);
+   const b=(a,b,w)=>{const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1,p=-dy*w*.5/l,q=dx*w*.5/l;Q([[a[0]-p,a[1]-q],[b[0]-p,b[1]-q],[b[0]+p,b[1]+q],[a[0]+p,a[1]+q]]);};
+   glyph[k](r,b,Q);x+=wid[i]+gap;
+  }
+ }
+ word('NORTH POLE',3.525,.322,.426,.037,CREAM);
+ word('LANES',3.288,.234,.208,.073,GOLD);
+ return shapes;
+})();
+
 function northLodgeFinish(A){
  const {cone}=A,ink='#34333e',brass='#bb8a58',dz=A.facadeOffset||0;
  const ball=(x,y,z,...q)=>A.ball(x,y,z+dz,...q),block=(x,y,z,...q)=>A.block(x,y,z+dz,...q),
  limb=(a,b,...q)=>A.limb([a[0],a[1],a[2]+dz],[b[0],b[1],b[2]+dz],...q);
  // Inner café windows sit above the heads of the rack, not in the aiming band.
  for(const x of [-1.15,1.15]){
-  const y=2.76,z=37.93;
+  const y=2.638,z=37.93;
   block(x,y,z,.91,.99,.14,'#443341',4);
   block(x,y,z-.082,.72,.78,.052,'#f0a96a',6);
   block(x,y+.08,z-.119,.58,.52,.016,'#ffd59b',6);
@@ -762,12 +830,9 @@ function northLodgeFinish(A){
   block(x,y-.389,z-.112,.84,.085,.145,'#c19065',4);
   for(const sign of [-1,1])block(x+sign*.40,y,z-.123,.078,.82,.079,'#6c4d54',4);
  }
- // Timber sign, four slim brass edges around a deep blue face and tiny fasteners.
- block(0,3.68,37.75,3.46,.55,.035,'#203646',0);
+ // Matching hand-lettered plaque on the two scene facades.
+ A.plaque(dz);
  for(const side of [-1,1]){
-  block(0,3.68+side*.275,37.713,3.58,.039,.046,brass,4);
-  block(side*1.741,3.68,37.713,.041,.554,.046,brass,4);
-  ball(side*1.59,3.69,37.656,.034,.034,.019,'#f6cc7d',6);
   // Low light suspended from a dark forged bracket, behind the center wreath.
   const bx=side*1.76,bz=37.59;
   limb([bx,4.25,37.76],[bx,4.25,bz],.033,.030,ink,0);
@@ -857,6 +922,12 @@ function northHolidayCanvas(view){
  faces=[];
  const ch=northCharacterFallback(),paintSphere=northFallbackColor;
  const A={facadeOffset:-.56,
+  plaque(dz){
+   for(const [c,z,shape] of NORTH_PLAQUE){
+    const pts=shape.map(([x,y])=>project([x,y,z+dz]));
+    if(!pts.some(p=>!p)){const middle=project([0,3.64,z+dz]);if(middle)faces.push([middle[2],pts,c,false,0,true]);}
+   }
+  },
   ball(x,y,z,w,h,d,c,m){ch.S(id,x,y,z,w,h,d,c,m);},
   block(x,y,z,w,h,d,c){box(id,x,y,z,w,h,d,c);},
   cone(x,y,z,w,h,c){tent(id,x,y,z,w,h,c);},
@@ -1553,7 +1624,6 @@ function panelUI(){
 }
 function panelDetails(){
  const panel=cam.split||W;
- mark('NORTH POLE LANES',[0,3.668,37.64],.30,'#ffdc9c');
  for(const p of particles){const a=project([p.x,p.y,p.z]);if(!a)continue;g.globalAlpha=clamp(p.l,0,1);g.fillStyle='#ffe1a0';g.fillRect(a[0],a[1],3,3);}g.globalAlpha=1;
  for(const [x,y,r] of snow){g.fillStyle=r>2?'#fff7e4a0':'#fff7e448';g.fillRect((x+time*r*5)%640,(y+time*r*12)%570,r*W/panel,r)}
 }
@@ -1704,7 +1774,31 @@ for(let i=0;i<10;i++){
  for(const q of [a,b,d,a,d,c])holidayStarVertices.push(...q,...n);
 }
 mesh('northHolidayStar',holidayStarVertices);
+const northPlaqueParts={};
+for(const [color,z,shape] of NORTH_PLAQUE){
+ const verts=northPlaqueParts[color]||=([]);
+ // Ear-clip the few concave pennants/leaf shapes when baking the mesh
+ // so the same edges/holes are visible in native and fallback.
+ const cross=(a,b,c)=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+ const winding=Math.sign(shape.reduce((s,p,i)=>{const q=shape[(i+1)%shape.length];return s+p[0]*q[1]-q[0]*p[1];},0))||1;
+ const left=shape.map((_,i)=>i);
+ for(let step=0;left.length>2&&step<shape.length*2;step++){
+  let cut=false;
+  for(let i=0;i<left.length;i++){
+   const a=shape[left[(i+left.length-1)%left.length]],b=shape[left[i]],c=shape[left[(i+1)%left.length]];
+   if(cross(a,b,c)*winding<=1e-8)continue;
+   const other=left.some(j=>{const p=shape[j];return p!==a&&p!==b&&p!==c&&cross(a,b,p)*winding>1e-8&&cross(b,c,p)*winding>1e-8&&cross(c,a,p)*winding>1e-8;});
+   if(other)continue;
+   for(const p of [a,b,c])verts.push(p[0],p[1],z,0,0,-1);
+   left.splice(i,1);cut=true;break;
+  }
+  if(!cut)break;
+ }
+}
+const northPlaqueNames=Object.keys(northPlaqueParts);
+for(let i=0;i<northPlaqueNames.length;i++)mesh('northPlaque'+i,northPlaqueParts[northPlaqueNames[i]]);
 const northHolidayGL={
+ plaque(){for(let i=0;i<northPlaqueNames.length;i++)add('northPlaque'+i,id,0,0,0,1,1,1,northPlaqueNames[i],6,false);},
  ball(x,y,z,w,h,d,c,m){LOD(id,x,y,z,w,h,d,c,m);},
  block(x,y,z,w,h,d,c,m){block(id,x,y,z,w,h,d,c,m);},
  cone(x,y,z,w,h,c){add('pine',id,x,y,z,w,h,w,c,7);},
