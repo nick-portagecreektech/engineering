@@ -29,7 +29,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 @media(max-width:430px){body{padding:5px}.window{border-radius:14px}.title{padding:7px 10px}.stage{margin:0 6px;border-radius:8px}.scores{margin:0 6px 6px}.bar{padding:8px}.card{padding:15px}.card p{font-size:12px}.card h2{font-size:26px}}
 @media(max-width:340px){.card{padding:9px}.card h2{font-size:21px}}
 
-.stage{isolation:isolate;background:radial-gradient(ellipse 50px 48px at 80% 12%,#fadfa9 0 29px,#ecbd8844 31px,transparent 49px),linear-gradient(174deg,#142544,#3f5e78 47%,#749ab0 73%,#b9c7d6);}
+.stage{isolation:isolate;background:radial-gradient(ellipse at 46% 55%,#ca95634d 0%,#ca956322 23%,transparent 61%),radial-gradient(ellipse 30px 28px at 79% 12%,#f3e0b7 0 16px,#e1c89440 18px,transparent 28px),linear-gradient(172deg,#14233e,#3a5772 46%,#7f94a2 71%,#c4c6cf);}
 .stage #lane{position:relative;z-index:1}
 .stage .gpu-lane{position:absolute;z-index:0;inset:0;width:100%;height:100%;pointer-events:none;}
 .stage .gpu-lane[hidden]{display:none}
@@ -60,7 +60,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     <button type="button" id="originalScreamPreview" aria-describedby="originalScreamStatus" disabled>Play original scream</button>
     <button type="button" id="tauntRemove" disabled>Remove</button>
    </div>
-   <p class="taunt-note">ZIP, original EXE, or original WAVs. Audio stays in this browser. Nothing is uploaded or run.</p>
+   <p class="taunt-note">Built-in sounds are ready when you play. Saved original sounds load automatically in this browser. Original 1999 sounds by NVision Design may load automatically on this GitHub game from an unchanged copy at the Internet Archive. If it’s unavailable, choose your game file. Only the sounds are saved in your browser.</p>
   </div>
  </details>
 </section>
@@ -181,6 +181,88 @@ const screamListen=$('originalScreamPreview'),screamStatus=$('originalScreamStat
 const clips=new Map();
 let busy=false,hasSaved=false,heard=-1;
 const ids=Object.keys(defs);
+// The publisher's intact release is fetched only by the live GitHub game.
+// The executable is never run, written into storage, or bundled by this site.
+const archiveRelease='https://archive.org/download/OldSoftwareCDRCollection/CD2.iso/ElfBowl.exe';
+const archivePage='https://nick-portagecreektech.github.io',autoPref='north-pole-archive-auto-off-v1';
+const eligiblePage=()=>typeof location!=='undefined'&&location.origin===archivePage&&['/engineering/north-pole-strike/','/engineering/north-pole-strike/index.html'].includes(location.pathname);
+let autoAttempted=false,autoReading=false,autoLocalKnown=false,autoControl=null,autoPending=null,autoVersion=0;
+function autoAllowed(){
+ try{return localStorage.getItem(autoPref)!=='1'&&localStorage.getItem('north-pole-sound')!=='0';}catch{return false;}
+}
+function autoNeeded(){
+ return (!hasSaved&&clips.size===0)||(clips.size===5&&ids.slice(0,5).every(id=>clips.has(id)));
+}
+function cancelAuto(){
+ autoVersion++;autoAttempted=true;autoPending=null;
+ if(autoControl){autoControl.abort();autoControl=null;}autoReading=false;
+}
+async function archiveBytes(response){
+ if(!response.ok||!response.body)throw Error('Release unavailable');
+ const stated=response.headers.get('content-length');
+ if(stated!==null&&Number(stated)!==archive.size)throw Error('Unexpected release size');
+ const b=new Uint8Array(archive.size),read=response.body.getReader();
+ let used=0;
+ try{
+  for(;;){
+   const next=await read.read();if(next.done)break;
+   if(used+next.value.byteLength>archive.size){await read.cancel();throw Error('Unexpected release size');}
+   b.set(next.value,used);used+=next.value.byteLength;
+  }
+ }finally{read.releaseLock();}
+ if(used!==archive.size)throw Error('Incomplete release');
+ return b;
+}
+async function tryAutoArchive(){
+ if(!startupReady||!autoLocalKnown||autoAttempted||busy||!autoNeeded()||
+    !eligiblePage()||!autoAllowed()||typeof fetch!=='function'||typeof AbortController!=='function'||typeof DecompressionStream!=='function')return;
+ autoAttempted=true;autoReading=true;
+ const version=++autoVersion,controller=new AbortController();
+ autoControl=controller;
+ const timeout=setTimeout(()=>controller.abort(),11000);
+ tell('Getting the original sounds. You can play while they load.');
+ try{
+  const reply=await fetch(archiveRelease,{method:'GET',mode:'cors',credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store',signal:controller.signal});
+  const bytes=await archiveBytes(reply);
+  // fromExe checks the complete release's exact expected length + SHA-256
+  // before touching any audio offsets. Each decompressed WAV is hashed too.
+  const verified=await fromExe(bytes);
+  if(autoVersion!==version||controller.signal.aborted||!autoNeeded()||busy)return;
+  autoPending=verified;
+  if(window.northPackAtRest?.())applyAutoArchive();
+  else tell('Original sounds verified. They’ll start with the next roll.');
+ }catch{
+  if(autoVersion===version&&!busy)tell('Original sounds unavailable automatically. Built-in sounds are ready, or you can choose the 1999 game file.');
+ }finally{
+  clearTimeout(timeout);
+  if(autoVersion===version){autoControl=null;autoReading=false;}
+ }
+}
+function applyAutoArchive(){
+ if(!autoPending||busy||!autoAllowed()||!autoNeeded())return;
+ const accepted=autoPending;autoPending=null;busy=true;
+ const version=autoVersion,storedBefore=hasSaved;
+ for(const [id,clip] of accepted)clips.set(id,clip);
+ changed();
+ tell('Original sounds loaded. Saving in this browser…');
+ void (async()=>{
+  let stored=false,timer;
+  try{
+   const deadline=new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Could not save sounds')),1100);});
+   await Promise.race([store('readwrite',s=>{
+    if(autoVersion!==version||!autoAllowed())throw Error('Original save canceled');
+    return s.put(Object.fromEntries(accepted),'clips');
+   }),deadline]);
+   stored=true;
+  }catch{
+   if(autoVersion===version)autoVersion++;
+  }finally{
+   clearTimeout(timer);hasSaved=stored||storedBefore;busy=false;refresh();
+   tell(describe(clips.size,stored));
+  }
+ })();
+}
+
 const bytes=value=>value instanceof Uint8Array?value:new Uint8Array(value);
 const u16=(view,n)=>view.getUint16(n,true),u32=(view,n)=>view.getUint32(n,true);
 const view=buf=>new DataView(buf.buffer,buf.byteOffset,buf.byteLength);
@@ -325,35 +407,54 @@ async function store(mode,action){
  }finally{db.close();}
 }
 function describe(n,stored){
- if(!n)return 'New taunts already play. Choose the 1999 game file to add the original voices and effects.';
+ if(!n)return 'Built-in sounds play by default. Choose the 1999 game file to add the original voices and effects.';
  const saved=stored?'Saved in this browser.':'Not saved; this tab only.';
  if(n<ids.length)return n+' original '+(n===1?'sound is':'sounds are')+' still available. Choose the original ZIP again to add any missing sounds. '+saved;
  return n+' original sounds loaded, including the roll, approaching-ball yell, pins and Santa. '+saved;
 }
+// Verify saved audio as one snapshot. The play button never races a
+// partially restored pack, even if storage or the first hash stalls.
+let startupReady=false,finishStartup;
+const startup=new Promise(resolve=>{finishStartup=resolve;});
 window.northOriginal=Object.freeze({
  has:id=>clips.has(id),
  read:id=>clips.get(id)?.slice().buffer,
+ isReady:()=>startupReady,
+ whenReady:()=>startup,
+ tryAuto:tryAutoArchive,
+ boundary:applyAutoArchive,
 });
+async function savedSounds(){
+ const saved=await store('readonly',s=>s.get('clips'));
+ const accepted=await Promise.all(ids.map(async id=>{
+  const val=saved?.[id];
+  if(!(val instanceof Uint8Array||val instanceof ArrayBuffer))return null;
+  const a=await checked(id,val);return a?[id,a]:null;
+ }));
+ return {saved:Boolean(saved),accepted:accepted.filter(Boolean)};
+}
 busy=true;refresh();
 (async()=>{
+ let timer;
  try{
-  const saved=await store('readonly',s=>s.get('clips'));
-  for(const id of ids){
-   const val=saved?.[id];
-   if(val instanceof Uint8Array||val instanceof ArrayBuffer){
-    const a=await checked(id,val);if(a)clips.set(id,a);
-   }
-  }
-  hasSaved=Boolean(saved);tell(describe(clips.size,hasSaved));
- }catch{tell('Choose your original game file. Browser storage may be unavailable.');}
- finally{busy=false;changed();}
+  // Timeout only the saved-pack lookup. Later completion never mutates the
+  // active registry mid-roll. The ZIP picker remains available.
+  const deadline=new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Saved sounds unavailable')),1100);});
+  const restored=await Promise.race([savedSounds(),deadline]);
+  for(const [id,a] of restored.accepted)clips.set(id,a);
+  hasSaved=restored.saved;autoLocalKnown=true;tell(describe(clips.size,hasSaved));
+ }catch{tell('Saved sounds could not be restored. Play with the built-in sounds or select your original game file.');}
+ finally{
+  clearTimeout(timer);busy=false;startupReady=true;changed();finishStartup();
+  void tryAutoArchive();
+ }
 })();
-load.addEventListener('click',()=>{if(!busy)picker.click();});
+load.addEventListener('click',()=>{if(!busy){if(autoReading||autoPending)cancelAuto();picker.click();}});
 picker.addEventListener('change',async()=>{
  const files=Array.from(picker.files||[]);
  picker.value='';
  if(!files.length||busy)return;
- busy=true;refresh();tell('Checking the file on this device…');
+ cancelAuto();busy=true;refresh();tell('Checking the file on this device…');
  try{
   const {next,old,skipped}=await importFiles(files);
   if(!next.size){
@@ -386,10 +487,11 @@ screamListen.addEventListener('click',async()=>{
 });
 remove.addEventListener('click',async()=>{
  if(busy)return;
- busy=true;refresh();
+ cancelAuto();busy=true;refresh();
  try{
   if(hasSaved)await store('readwrite',s=>s.delete('clips'));
-  hasSaved=false;clips.clear();changed();tell('Original audio removed from this browser.');
+  try{localStorage.setItem(autoPref,'1');}catch{}
+  hasSaved=false;clips.clear();changed();tell('Original audio removed. It won’t download again automatically in this browser.');
  }catch{tell('Browser storage could not remove the audio, so it is still loaded.');}
  finally{busy=false;refresh();}
 });
@@ -589,7 +691,12 @@ function cue(name,d={}){
  }catch(_){}
 }
 function tune(t,notes,step,amp){notes.forEach((f,i)=>tone(t+i*step,f,f*.99,.17,amp,'triangle'));}
-window.northAudio=Object.freeze({cue,mute,lastTaunt:()=>lastAudibleTaunt,
+function primeBuiltIn(){
+ if(muted)return;
+ unlock();if(!ctx||ctx.state==='closed')return;
+ for(const id of Object.keys(clips))void prepared(id).catch(()=>null);
+}
+window.northAudio=Object.freeze({cue,mute,primeBuiltIn,lastTaunt:()=>lastAudibleTaunt,
  clearOriginal(){
   imported.clear();quietOriginalFX();
   if(voiceKind.startsWith('old'))stopVoice();
@@ -664,6 +771,97 @@ function paint(){
 }
 function mark(s,p,size,col='#fff4dc'){const q=project(p);if(!q)return;g.font='900 '+clamp(size*cam.f/q[2],8,34)+'px Trebuchet MS';g.textAlign='center';g.fillStyle=col;g.fillText(s,q[0],q[1])}
 const deco=[[-8,10],[-7,25],[-10,35],[9,7],[7,18],[9,30],[8,41],[-6,44],[-13,52],[13,52],[-15,30],[13,13],[-11,18],[10,24]];
+// Original festive scenery. Shared world positions for Canvas and GLES.
+const NORTH_GOLD='#ffcc67',NORTH_RIBBON='#b62e3e',NORTH_FIR='#1b563e';
+const NORTH_LIGHTS=['#ffd67a','#fe7a65','#f8e4a5','#79d5a3'];
+function northHolidaySet(A){
+ const {ball,block,limb,cone,star}=A;
+ function swag(x0,x1,y,dip,z){
+  const points=[];
+  for(let j=0;j<=8;j++){
+   const t=j/8,x=mix(x0,x1,t),p=[x,y-dip*Math.sin(R*t),z];points.push(p);
+   if(j%2===0)ball(x,p[1]-.073,z-.06,.056,.057,.036,NORTH_LIGHTS[(j/2)%4],6);
+  }
+  for(let j=1;j<points.length;j++)limb(points[j-1],points[j],.082,.061,NORTH_FIR,0);
+ }
+ function tree(x,z,h,r,seed){
+  block(x,.30,z,.29,.60,.29,'#76503d',7);
+  for(let j=0;j<4;j++){
+   const u=j/4,y=h*(.12+u*.65),w=r*(1-j*.19),len=h*(.42-j*.024);
+   cone(x,y,z,w,len,'#1a513f');
+   cone(x,y+len*.32,z,w*.72,len*.72,j%2?'#4d796b':'#547e70');
+   // Turn each shallow ornament arc toward the cameras without crossing the lane.
+   const points=[];
+   for(let k=0;k<5;k++){
+    const t=k/4,a=-1.11+t*2.22+((j%2)*.07),v=y+len*(.23+.12*(2*t-1)**2),rad=w*(j===0?.87:.82),
+     p=[x+Math.sin(a)*rad,v,z-Math.cos(a)*rad];points.push(p);
+    if(k%2===0||j%2===0){
+     const color=NORTH_LIGHTS[(k+j+seed)%4],size=.057+.012*((k+j)%3)*(h/3);
+     ball(p[0],p[1]-.033,p[2]-.032,size,size*1.04,size*.72,color,(k+j)%2?4:6);
+    }
+   }
+   for(let k=1;k<points.length;k++)limb(points[k-1],points[k],.019,.019,'#bb8c49',4);
+  }
+  star(x,h*1.01,z-.067,Math.max(.19,h*.069),NORTH_GOLD);
+ }
+ // Main approach trees beyond the gutters; lodge trees frame the rack from behind.
+ tree(-4.58,17.30,4.75,1.42,0);tree(4.64,21.65,4.54,1.34,2);
+ tree(-2.85,36.08,2.96,.89,1);tree(2.94,36.26,3.11,.94,3);
+ // Wreath above the readable lodge sign. Brass ornament studs and a cloth bow.
+ for(let i=0;i<16;i++){
+  const a=i*R/8,x=.411*Math.cos(a),y=4.49+.324*Math.sin(a);
+  ball(x,y,37.67,.137,.124,.079,i%2?'#24583d':'#386a47',0);
+  if(i%3===0)ball(x,y,37.575,.061,.061,.037,i%2?NORTH_RIBBON:NORTH_GOLD,4);
+ }
+ for(const side of [-1,1]){
+  ball(side*.134,4.245,37.565,.130,.074,.048,NORTH_RIBBON,1);
+  limb([side*.064,4.23,37.56],[side*.178,4.09,37.56],.039,.026,NORTH_RIBBON,1);
+ }
+ ball(0,4.245,37.528,.062,.058,.058,'#f05658',4);
+ swag(-3.78,-.73,4.75,.30,37.69);swag(.73,3.78,4.75,.30,37.69);
+ // Two candy-shop posts and presents at the lodge, outside the play surface.
+ for(const sign of [-1,1]){
+  const x=sign*3.77,z=36.51;
+  block(x,.80,z,.13,1.60,.14,'#eee4d2',2);
+  for(let j=0;j<5;j++)block(x,.15+j*.28,z,.142,.12,.151,NORTH_RIBBON,4);
+  ball(x,1.64,z,.108,.108,.108,NORTH_GOLD,6);
+  const bx=sign*2.97,bz=35.72+sign*.08;
+  for(const [dx,y,dz,w,h,d,c] of [[.32,.21,0,.47,.40,.45,'#ad3946'],[-.15,.16,.22,.38,.31,.43,'#305d67'],[.38,.52,.04,.32,.24,.34,'#447c5a']]){
+   const xx=bx+sign*dx,zz=bz+dz;
+   block(xx,y,zz,w,h,d,c,4);
+   block(xx,y,zz-d*.502,w*.23,h,.012,NORTH_GOLD,4);
+   block(xx,y+h*.48,zz,w+.016,.030,d+.015,c,4);
+   block(xx,y+h*.51,zz,w*.21,.014,d+.023,NORTH_GOLD,6);
+  }
+ }
+}
+
+const northHolidayCanvasCache={};
+function northHolidayCanvas(view){
+ const steady=state!=='intro'&&(view==='lane'||state!=='result'),old=faces;
+ if(steady&&northHolidayCanvasCache[view]){
+  faces.push(...northHolidayCanvasCache[view]);return;
+ }
+ faces=[];
+ const ch=northCharacterFallback(),paintSphere=northFallbackColor;
+ const A={
+  ball(x,y,z,w,h,d,c,m){ch.S(id,x,y,z,w,h,d,c,m);},
+  block(x,y,z,w,h,d,c){box(id,x,y,z,w,h,d,c);},
+  cone(x,y,z,w,h,c){tent(id,x,y,z,w,h,c);},
+  limb(a,b,w,d,c,m){ch.limb(id,a,b,w,d,c,m);},
+  star(x,y,z,r,c){
+   const p=[];
+   for(let j=0;j<10;j++){
+    const a=R*.5+j*R*.20,r1=j%2?.45*r:r;
+    p.push(project([x+Math.cos(a)*r1,y+Math.sin(a)*r1,z]));
+   }
+   if(!p.some(q=>!q))faces.push([p[0][2],p,paintSphere(c,6)[0]]);
+  }
+ };
+ northHolidaySet(A);
+ if(steady)northHolidayCanvasCache[view]=faces.slice();
+ old.push(...faces);faces=old;
+}
 function world(){
  for(let z=-18;z<65;z+=4){quad(-7.3,z,10,4,.0,'#9ebbcc');quad(7.3,z,10,4,.0,'#acc5d2');
  for(let i=0;i<8;i++){const k=(i*3+Math.round(z/4)*2+44)%5;quad(-2.1+i*.6,z,.6,4,.025,['#c89150','#dbad68','#e1b777','#d5a261','#e6bb7b'][k])}quad(-2.65,z,.49,4,.012,'#2b5363');quad(2.65,z,.49,4,.012,'#2b5363');quad(-3,z,.15,4,.045,'#a94942');quad(3,z,.15,4,.045,'#a94942');}
@@ -1141,8 +1339,34 @@ function cueAudio(name,data={}){try{window.northAudio?.cue(name,data)}catch{}}
 
 function rack(){pins=[];for(let i=0;i<4;i++)for(let j=0;j<=i;j++){let x=(j-i/2)*.75,z=DECK+i*.70;pins.push({id:pins.length,x,z,y:0,vx:0,vz:0,vy:0,rx:0,ry:0,rz:0,wx:0,wz:0,down:false,moving:false})}}
 function resetTurn(){phase=0;B=null;incomingScare=null;state='aim';resetSweep();scoreUI();announce('WATCH THE DIRECTION ARROWS.','Tap the lane or press Space / Enter to bowl.');nextHeckle=Math.max(nextHeckle,time+2.45)}
-function start(){frames=[[]];frame=0;shot=0;particles=[];acc=0;heckleSerial=0;laughSeen=false;heckler=-1;nextHeckle=time;rack();resetTurn();$('overlay').classList.add('hidden');c.focus?.({preventScroll:true});try{window.northAudio?.mute(muted)}catch{}cueAudio('start');showHeckle(drawBanter('open'),pins,-1,true);sound(550,.14);}
-function bowl(){if(state!=='aim'||last-sweepStarted<SLOT_MS)return;locked=aim;state='approach';phase=0;knocked=0;nearHits=0;rollLen=0;shot++;scoreUI();announce('AIM LOCKED.','Watch Santa lift, plant and release.');cueAudio('lock');sound(180,.2,'triangle')}
+let openingPending=false;
+function start(){
+ if(openingPending)return;
+ // Make or resume Web Audio in the trusted gesture, before any async work.
+ try{window.northAudio?.mute(muted);}catch{}
+ const registry=window.northOriginal;
+ if(!registry?.whenReady||registry.isReady())return beginGame();
+ openingPending=true;
+ const play=$('start'),prior=play?.textContent;
+ if(play){play.disabled=true;play.textContent='LOADING SOUNDS…';}
+ try{window.northAudio?.primeBuiltIn?.();}catch{}
+ const finish=()=>{
+  openingPending=false;
+  if(play){play.disabled=false;play.textContent=prior;}
+  beginGame();
+ };
+ registry.whenReady().then(finish,finish);
+}
+function beginGame(){
+ window.northOriginal?.boundary?.();
+ frames=[[]];frame=0;shot=0;particles=[];acc=0;heckleSerial=0;laughSeen=false;heckler=-1;nextHeckle=time;
+ rack();resetTurn();$('overlay').classList.add('hidden');c.focus?.({preventScroll:true});
+ cueAudio('start');showHeckle(drawBanter('open'),pins,-1,true);
+ // The opening voice is requested first; prepare the rest without holding play.
+ try{window.northAudio?.primeBuiltIn?.();}catch{}
+ sound(550,.14);
+}
+function bowl(){if(state!=='aim'||last-sweepStarted<SLOT_MS)return;window.northOriginal?.boundary?.();locked=aim;state='approach';phase=0;knocked=0;nearHits=0;rollLen=0;shot++;scoreUI();announce('AIM LOCKED.','Watch Santa lift, plant and release.');cueAudio('lock');sound(180,.2,'triangle')}
 function launch(){state='roll';phase=0;B=launchBall(locked);announce('BALL AWAY!','Watch the deck.');cueAudio('release',{aim:locked});sound(180,.27,'triangle')}
 function push(p,vx,vz){let j=Math.hypot(vx,vz);if(j<.22)return;p.vx+=vx;p.vz+=vz;if(!p.down&&Math.hypot(p.vx,p.vz)>.61){p.down=true;p.moving=true;p.vy=.95+j*.22;p.wx=-p.vz*1.45;p.wz=p.vx*2.3;knocked++;if(forecasting)return;p.fellAt=time;p.impactX=p.x;p.impactZ=p.z;p.hitX=vx;p.hitZ=vz;cueAudio('pin',{index:p.id,force:j,count:knocked});if(nearHits++<5)sound(165+p.id*23,.08,'triangle');for(let i=0;i<6;i++)particles.push({x:p.x,y:.55,z:p.z,vx:(Math.random()-.5)*3,vz:(Math.random()-.5)*3,vy:1+Math.random()*2,l:1+Math.random()*.4})}}
 let incomingScare=null;
@@ -1217,7 +1441,7 @@ function recordRoll(){playLaneExit();const a=frames[frame];a.push(knocked);const
  showHeckle(drawBanter(bucket,knocked>=7),alive,-1,true);
  announce(spare?'SPARE!':knocked===10?'STRIKE!':knocked?knocked+' ELVES DOWN.':B?.gutter?'GUTTER BALL.':'NO CONTACT.',knocked===10?'Rack cleared.':knocked?'Watch for the sweep.':'Read the deck and line up again.');
  state='result';nextAt=time+(knocked===0?1.13:1.02);phase=0;scoreUI();cueAudio('result',{pins:knocked,hit:knocked,strike:knocked===10&&!spare,spare,santa:firstStrike,cleared:alive.length===0});if(spare||knocked===10){sound(520,.18);sound(780,.3)}}
-function nextRoll(){let a=frames[frame],fresh=false;if(frameDone(frame,a)){if(frame===9){end();return;}frame++;frames.push([]);rack();fresh=true;}else if(frame===9&&(a[a.length-1]===10||a.length===2&&a[0]+a[1]===10)){rack();fresh=true;}else pins=pins.filter(p=>!p.down);cueAudio('rack',{fresh});resetTurn();announce(pins.length===10?'FRESH RACK.':pins.length+' LEFT STANDING.','Catch the light to bowl again.');}
+function nextRoll(){window.northOriginal?.boundary?.();let a=frames[frame],fresh=false;if(frameDone(frame,a)){if(frame===9){end();return;}frame++;frames.push([]);rack();fresh=true;}else if(frame===9&&(a[a.length-1]===10||a.length===2&&a[0]+a[1]===10)){rack();fresh=true;}else pins=pins.filter(p=>!p.down);cueAudio('rack',{fresh});resetTurn();announce(pins.length===10?'FRESH RACK.':pins.length+' LEFT STANDING.','Catch the light to bowl again.');}
 
 // Perspective, camera choreography and animated 3D set.
 let skyF=0;
@@ -1271,8 +1495,8 @@ function panelDetails(){
 function drawFallback(){
  function panel(view,x,width){
  sceneCamera(view);faces=[];g.save();g.beginPath();g.rect(x,0,width,H);g.clip();g.translate(x,0);g.scale(width/W,1);
- let gradient=g.createLinearGradient(0,0,0,H);gradient.addColorStop(0,'#162647');gradient.addColorStop(.58,'#4b7891');gradient.addColorStop(1,'#b6c8d5');g.fillStyle=gradient;g.fillRect(0,0,W,H);
- world();decor();pins.forEach(elf);
+ let gradient=g.createLinearGradient(0,0,0,H);gradient.addColorStop(0,'#122342');gradient.addColorStop(.57,'#597183');gradient.addColorStop(1,'#cbc2b9');g.fillStyle=gradient;g.fillRect(0,0,W,H);
+ world();northHolidayCanvas(view);decor();pins.forEach(elf);
  if(state==='intro'){santa(.18,7.1,0,.08*Math.sin(time*3));ball(1.1,.33,7,.4);}
  else if(view==='lane'){
    const k=state==='aim'?0:state==='approach'?phase/DELIVERY:1,follow=state==='roll'?phase:state==='aim'||state==='approach'?0:.65,d=delivery(k,follow);
@@ -1387,8 +1611,26 @@ function ballGL(x,y,z,theta){const T=pose(x,y,z,theta,-.18,.2);S(T,0,0,0,.309,.3
 const cube=[];for(const f of boxf){const a=boxv[f[0]],b=boxv[f[1]],c=boxv[f[2]],p=b.map((x,i)=>x-a[i]),q=c.map((x,i)=>x-a[i]),n=norm(p[1]*q[2]-p[2]*q[1],p[2]*q[0]-p[0]*q[2],p[0]*q[1]-p[1]*q[0]);for(const k of [0,1,2,0,2,3])cube.push(...boxv[f[k]],...n)}
 mesh('box',cube);
 const block=(T,x,y,z,w,h,d,c,m=0)=>add('box',T,x,y,z,w,h,d,c,m);
+const holidayStarVertices=[];
+for(let i=0;i<10;i++){
+ const p=(j,z)=>{const a=R*.5+j*R*.20,r=j%2?.45:1;return [Math.cos(a)*r,Math.sin(a)*r,z];};
+ const a=p(i,-.22),b=p(i+1,-.22),c=p(i,.22),d=p(i+1,.22);
+ holidayStarVertices.push(0,0,-.22,0,0,-1,...b,0,0,-1,...a,0,0,-1);
+ holidayStarVertices.push(0,0,.22,0,0,1,...c,0,0,1,...d,0,0,1);
+ const n=norm(b[1]-a[1],a[0]-b[0],0);
+ for(const q of [a,b,d,a,d,c])holidayStarVertices.push(...q,...n);
+}
+mesh('northHolidayStar',holidayStarVertices);
+const northHolidayGL={
+ ball(x,y,z,w,h,d,c,m){LOD(id,x,y,z,w,h,d,c,m);},
+ block(x,y,z,w,h,d,c,m){block(id,x,y,z,w,h,d,c,m);},
+ cone(x,y,z,w,h,c){add('pine',id,x,y,z,w,h,w,c,7);},
+ limb(a,b,w,d,c,m){limb(id,a,b,w,d,c,m,false);},
+ star(x,y,z,r,c){add('northHolidayStar',id,x,y,z,r,r,r,c,6);}
+};
 let cached=null;
 function lodge(){
+northHolidaySet(northHolidayGL);
 for(let z=-11;z<65;z+=6){
  q(-12.7,-.012,z,10.3,3.005,'#b2c7d8',7);q(12.7,-.012,z,10.3,3.005,'#c1d0dd',7);
  q(0,.006,z,2.37,3.005,'#d9b486',3);q(-2.66,.009,z,.29,3.005,'#253d58',4);q(2.66,.009,z,.29,3.005,'#253d58',4);
@@ -1475,10 +1717,11 @@ function draw(){if(gpu){try {gpu.draw();return;}catch(err){console.warn('North P
 initNorthGL();
 
 
+window.northPackAtRest=()=>state==='intro'||state==='over';
 function tick(t){let dt=Math.min((t-last)/1000||.016,.04);last=t;if(!document.hidden){time+=dt;if(state==='aim')scanSweep(t);acc+=dt;while(acc>=STEP){sim(STEP);acc-=STEP}if(state==='result'){phase+=dt;if(time>=nextAt)nextRoll()}particles=particles.filter(p=>(p.l-=dt)>0);particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;p.vy-=3.6*dt;});animationEvents();}
  draw();requestAnimationFrame(tick);}
 
-$('start').onclick=start;$('roll').onclick=bowl;$('mute').onclick=()=>{muted=!muted;try{localStorage.setItem('north-pole-sound',muted?'0':'1')}catch{}scoreUI();try{window.northAudio?.mute(muted)}catch{}sound(660);};c.addEventListener('pointerdown',e=>{if((e.button!==0&&!(e.pointerType==='mouse'&&[1,2].includes(e.button)))||state!=='aim')return;e.preventDefault();bowl();});
+$('start').onclick=start;$('roll').onclick=bowl;$('mute').onclick=()=>{muted=!muted;try{localStorage.setItem('north-pole-sound',muted?'0':'1')}catch{}scoreUI();try{window.northAudio?.mute(muted)}catch{}if(!muted){if(window.northPackAtRest())window.northOriginal?.boundary?.();void window.northOriginal?.tryAuto?.();}sound(660);};c.addEventListener('pointerdown',e=>{if((e.button!==0&&!(e.pointerType==='mouse'&&[1,2].includes(e.button)))||state!=='aim')return;e.preventDefault();bowl();});
 c.addEventListener('contextmenu',e=>e.preventDefault());
 c.addEventListener('auxclick',e=>e.preventDefault());
 window.addEventListener('keydown',e=>{
