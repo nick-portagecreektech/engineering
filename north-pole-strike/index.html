@@ -637,10 +637,10 @@ const boxv=[[-.5,-.5,-.5],[.5,-.5,-.5],[.5,.5,-.5],[-.5,.5,-.5],[-.5,-.5,.5],[.5
 function box(T,x,y,z,w,h,d,col){const v=boxv.map(p=>T([x+p[0]*w,y+p[1]*h,z+p[2]*d]));boxf.forEach(f=>face(f.map(i=>v[i]),col))}
 function round(T,x,y,z,w,h,d,col,rows=4,cols=8){const v=[];for(let i=0;i<=rows;i++){const a=i*R/rows;for(let j=0;j<cols;j++){const b=j*2*R/cols;v.push(T([x+w*Math.sin(a)*Math.cos(b),y+h*Math.cos(a),z+d*Math.sin(a)*Math.sin(b)]))}}for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){const a=i*cols+j,b=i*cols+(j+1)%cols;face([v[a],v[b],v[b+cols],v[a+cols]],col)}}
 const id=p=>p;
-function quad(x,z,w,d,y,col){face([[x-w/2,y,z-d/2],[x-w/2,y,z+d/2],[x+w/2,y,z+d/2],[x+w/2,y,z-d/2]],col,true)}
+function quad(x,z,w,d,y,col){const i=faces.length;face([[x-w/2,y,z-d/2],[x-w/2,y,z+d/2],[x+w/2,y,z+d/2],[x+w/2,y,z-d/2]],col,true);if(faces.length>i)faces[i][4]=2;}
 function tent(T,x,y,z,r,h,col){const top=T([x,y+h,z]);for(let i=0;i<6;i++){let a=i*R/3,b=(i+1)*R/3;face([T([x+r*Math.cos(a),y,z+r*Math.sin(a)]),top,T([x+r*Math.cos(b),y,z+r*Math.sin(b)])],col)}}
 function paint(){
- faces.sort((a,b)=>b[0]-a[0]);
+ faces.sort((a,b)=>(b[4]||0)-(a[4]||0)||b[0]-a[0]);
  for(const [,s,k,ellipse] of faces){
   g.beginPath();g.fillStyle=k;
   if(ellipse){
@@ -973,7 +973,7 @@ function northCharacterFallback(){
   }
   if(p.some(q=>!q))return;
   const weight=Math.round(39-24*Math.min(1,air/.4)).toString(16).padStart(2,'0');
-  faces.push([p.reduce((d,q)=>d+q[2]/p.length,0)-.11,p,'#392b29'+weight]);
+  faces.push([p.reduce((d,q)=>d+q[2]/p.length,0),p,'#392b29'+weight,false,1]);
  };
  return {S,LOD:S,limb,cap,beard,curl,contact,block:box};
 }
